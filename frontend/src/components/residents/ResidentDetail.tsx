@@ -38,6 +38,7 @@ export default function ResidentDetail({ resident: r, onEdit, onDelete, onClose 
         <DetailRow label="Gender" value={r.gender} />
         <DetailRow label="Age" value={r.age?.toString()} />
         <DetailRow label="Race" value={r.race} />
+        <DetailRow label="Krell Tribe" value={r.krellTribe} />
         <DetailRow label="Type" value={r.type} />
         <DetailRow label="Daily Pay" value={r.dailyPayRate != null ? `${r.dailyPayRate} tin` : undefined} />
         <DetailRow label="Land Owned" value={r.landOwned} />

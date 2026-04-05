@@ -7,6 +7,14 @@ import type { Resident } from '../types'
 const STATUS_FILTERS = ['All', 'Resident', 'HiredHelp', 'Visitor', 'Seasonal', 'Din', 'Other']
 const STATUS_LABELS: Record<string, string> = { HiredHelp: 'Hired Help' }
 
+function getRaceDisplay(resident: Resident): string {
+  if (!resident.race) return '—'
+  if (resident.race === 'Krell' && resident.krellTribe) {
+    return `${resident.race} (${resident.krellTribe})`
+  }
+  return resident.race
+}
+
 function Initials({ name }: { name: string }) {
   const parts = name.trim().split(' ')
   const initials = parts.length >= 2
@@ -124,7 +132,7 @@ export default function ResidentsPage() {
                     </td>
                     <td>{r.role}</td>
                     <td>{r.familyName ?? '—'}</td>
-                    <td>{r.race ?? '—'}</td>
+                    <td>{getRaceDisplay(r)}</td>
                     <td>{r.age ?? '—'}</td>
                     <td>{r.dailyPayRate != null ? `${r.dailyPayRate} tin` : '—'}</td>
                     <td>{r.landOwned ?? '—'}</td>
@@ -163,6 +171,7 @@ export default function ResidentsPage() {
                 <div className="card-name">{r.name}</div>
                 {r.title && <div className="card-title">{r.title}</div>}
                 <div className="card-role">{r.role}</div>
+                <div className="card-family">{getRaceDisplay(r)}</div>
                 {r.familyName && <div className="card-family">{r.familyName}</div>}
                 <span className={`badge badge-${r.status.toLowerCase()}`} style={{ marginTop: 4 }}>
                   {STATUS_LABELS[r.status] ?? r.status}

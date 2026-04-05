@@ -27,6 +27,7 @@ public class Resident
     public string? Role { get; set; }
     public string? Type { get; set; }
     public string? Race { get; set; }
+    public string? KrellTribe { get; set; }
     public Gender? Gender { get; set; }
     public int? Age { get; set; }
     public decimal? DailyPayRate { get; set; }

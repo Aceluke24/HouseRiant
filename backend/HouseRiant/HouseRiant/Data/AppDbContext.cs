@@ -40,6 +40,7 @@ public class AppDbContext : DbContext
             e.Property(r => r.StatusOther).IsRequired(false);
             e.Property(r => r.Type).IsRequired(false);
             e.Property(r => r.Race).IsRequired(false);
+            e.Property(r => r.KrellTribe).IsRequired(false);
             e.Property(r => r.LandOwned).IsRequired(false);
             e.Property(r => r.Appearance).IsRequired(false);
             e.Property(r => r.Skills).IsRequired(false);

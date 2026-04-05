@@ -33,6 +33,7 @@ export interface Resident {
   role?: string
   type?: string
   race?: string
+  krellTribe?: string
   gender?: Gender
   age?: number
   dailyPayRate?: number
@@ -55,6 +56,7 @@ export interface CreateResidentRequest {
   role?: string
   type?: string
   race?: string
+  krellTribe?: string
   gender?: Gender
   age?: number
   dailyPayRate?: number

@@ -28,8 +28,11 @@ function positiveInt(v: unknown): number | undefined {
 function buildResidentPayload(raw: CreateResidentRequest): CreateResidentRequest {
   const name = trimToUndefined(raw.name) ?? ''
   const status = raw.status as PersonStatus
+  const race = trimToUndefined(raw.race)
   let statusOther = trimToUndefined(raw.statusOther)
   if (status !== 'Other') statusOther = undefined
+  let krellTribe = trimToUndefined(raw.krellTribe)
+  if (race !== 'Krell') krellTribe = undefined
 
   return {
     name,
@@ -38,7 +41,8 @@ function buildResidentPayload(raw: CreateResidentRequest): CreateResidentRequest
     title: trimToUndefined(raw.title),
     role: trimToUndefined(raw.role),
     type: trimToUndefined(raw.type),
-    race: trimToUndefined(raw.race),
+    race,
+    krellTribe,
     gender: raw.gender == null ? undefined : (raw.gender as Gender),
     age: finiteNumber(raw.age),
     dailyPayRate: finiteNumber(raw.dailyPayRate),
@@ -60,6 +64,16 @@ interface Props {
 
 const STATUSES = ['Resident', 'HiredHelp', 'Visitor', 'Seasonal', 'Blank', 'Din', 'Other']
 const STATUS_LABELS: Record<string, string> = { HiredHelp: 'Hired Help' }
+const KRELL_TRIBES = [
+  'Azuir',
+  'Black Vale',
+  'Bloodhorn',
+  'Dumorg',
+  'Grodjen',
+  'Hannami',
+  'Lodrik',
+  'Whitehorn',
+]
 
 function PortraitUpload({ value, onChange }: { value?: string; onChange: (url: string) => void }) {
   const fileRef = useRef<HTMLInputElement>(null)
@@ -139,6 +153,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
     defaultValues: resident ? {
       name: resident.name, status: resident.status, statusOther: resident.statusOther,
       title: resident.title, role: resident.role, type: resident.type, race: resident.race,
+      krellTribe: resident.krellTribe,
       gender: resident.gender, age: resident.age, dailyPayRate: resident.dailyPayRate,
       landOwned: resident.landOwned, appearance: resident.appearance, skills: resident.skills,
       troopType: resident.troopType, levelOfRole: resident.levelOfRole,
@@ -152,6 +167,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
 
   const [submitError, setSubmitError] = useState<string | null>(null)
   const watchedStatus = watch('status')
+  const watchedRace = watch('race')
   const watchedImage = watch('imageUrl')
   const isPending = createResident.isPending || updateResident.isPending
 
@@ -290,9 +306,40 @@ export default function ResidentForm({ resident, onClose }: Props) {
             </div>
             <div className="form-group">
               <label>Race</label>
-              <input style={inputStyle} {...register('race')} placeholder="e.g. Human, Avintaali, Dwarf" />
+              <select
+                style={inputStyle}
+                {...register('race', {
+                  setValueAs: (v) => (v === '' || v == null ? undefined : v),
+                })}
+              >
+                <option value="">— Select —</option>
+                <option value="Aoten">Aoten</option>
+                <option value="Frell">Frell</option>
+                <option value="Humans">Humans</option>
+                <option value="Krell">Krell</option>
+                <option value="Rataan">Rataan</option>
+                <option value="Shim Thiir">Shim Thiir</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
+
+          {watchedRace === 'Krell' && (
+            <div className="form-group">
+              <label>Krell Tribe</label>
+              <select
+                style={inputStyle}
+                {...register('krellTribe', {
+                  setValueAs: (v) => (v === '' || v == null ? undefined : v),
+                })}
+              >
+                <option value="">— Select —</option>
+                {KRELL_TRIBES.map((tribe) => (
+                  <option key={tribe} value={tribe}>{tribe}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Type + Daily Pay */}
           <div className="form-grid-2">

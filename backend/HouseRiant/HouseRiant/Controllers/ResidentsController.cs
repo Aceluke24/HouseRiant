@@ -59,6 +59,7 @@ public class ResidentsController : ControllerBase
         {
             Name = req.Name, Status = req.Status, StatusOther = req.StatusOther,
             Title = req.Title, Role = req.Role, Type = req.Type, Race = req.Race,
+            KrellTribe = req.KrellTribe,
             Gender = req.Gender, Age = req.Age, DailyPayRate = req.DailyPayRate,
             LandOwned = req.LandOwned, Appearance = req.Appearance, Skills = req.Skills,
             TroopType = req.TroopType, LevelOfRole = req.LevelOfRole,
@@ -82,7 +83,8 @@ public class ResidentsController : ControllerBase
 
         resident.Name = req.Name; resident.Status = req.Status; resident.StatusOther = req.StatusOther;
         resident.Title = req.Title; resident.Role = req.Role; resident.Type = req.Type;
-        resident.Race = req.Race; resident.Gender = req.Gender; resident.Age = req.Age;
+        resident.Race = req.Race; resident.KrellTribe = req.KrellTribe;
+        resident.Gender = req.Gender; resident.Age = req.Age;
         resident.DailyPayRate = req.DailyPayRate; resident.LandOwned = req.LandOwned;
         resident.Appearance = req.Appearance; resident.Skills = req.Skills;
         resident.TroopType = req.TroopType; resident.LevelOfRole = req.LevelOfRole;
@@ -104,7 +106,7 @@ public class ResidentsController : ControllerBase
 
     private static ResidentResponse ToResponse(Resident r) => new(
         r.Id, r.Name, r.Status.ToString(), r.StatusOther, r.Title, r.Role,
-        r.Type, r.Race, r.Gender?.ToString(), r.Age, r.DailyPayRate,
+        r.Type, r.Race, r.KrellTribe, r.Gender?.ToString(), r.Age, r.DailyPayRate,
         r.LandOwned, r.Appearance, r.Skills, r.TroopType, r.LevelOfRole,
         r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name
     );
