@@ -243,7 +243,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
             </div>
             <div className="form-group">
               <label>Title</label>
-              <input style={inputStyle} {...register('title')} placeholder="Neophyte, Scholar, Free Scholar, Provost, Master, Grand Master" />
+              <input style={inputStyle} {...register('title')} placeholder="e.g. Knight, Lord, Osachionn" />
             </div>
           </div>
 
@@ -257,7 +257,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
             </div>
             <div className="form-group">
               <label>Role</label>
-              <input style={inputStyle} {...register('role')} placeholder="e.g. Farmer, Guard, Steward" />
+              <input style={inputStyle} {...register('role')} placeholder="e.g. Steward, Guard, Farmer" />
             </div>
           </div>
 
@@ -293,6 +293,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
                 <option value="">— Select —</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>
@@ -315,7 +316,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
                 <option value="">— Select —</option>
                 <option value="Aoten">Aoten</option>
                 <option value="Frell">Frell</option>
-                <option value="Humans">Humans</option>
+                <option value="Human">Human</option>
                 <option value="Krell">Krell</option>
                 <option value="Rataan">Rataan</option>
                 <option value="Shim Thiir">Shim Thiir</option>
@@ -352,7 +353,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
                 })}
               >
                 <option value="">— Select —</option>
-                <option value="Human">Human</option>
+                <option value="Person">Person</option>
                 <option value="Animal">Animal</option>
                 <option value="Creature">Creature</option>
                 <option value="Undead">Undead</option>
@@ -383,7 +384,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
           <div className="form-grid-2">
             <div className="form-group">
               <label>Level of Role</label>
-              <input style={inputStyle} {...register('levelOfRole')} placeholder="e.g. Captain, Neophyte, Master" />
+              <input style={inputStyle} {...register('levelOfRole')} placeholder="e.g. Neophyte, Scholar, Master" />
             </div>
           </div>
 
