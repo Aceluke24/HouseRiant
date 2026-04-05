@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useResidents, useDeleteResident } from '../hooks/useResidents'
 import ResidentForm from '../components/residents/ResidentForm'
 import ResidentDetail from '../components/residents/ResidentDetail'
@@ -37,7 +37,7 @@ function Portrait({ name, imageUrl, size = 80 }: { name: string; imageUrl?: stri
 
 export default function ResidentsPage() {
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
+  const [statusFilters, setStatusFilters] = useState<string[]>([])
   const [view, setView] = useState<'table' | 'grid'>('table')
   const [selected, setSelected] = useState<Resident | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -45,10 +45,37 @@ export default function ResidentsPage() {
 
   const { data: residents = [], isLoading } = useResidents({
     search: search || undefined,
-    status: statusFilter === 'All' ? undefined : statusFilter,
   })
 
+  const filteredResidents = useMemo(() => {
+    if (statusFilters.length === 0) return residents
+    return residents.filter((r) => statusFilters.includes(r.status))
+  }, [residents, statusFilters])
+
+  useEffect(() => {
+    if (!selected) return
+    if (!filteredResidents.some((r) => r.id === selected.id)) {
+      setSelected(null)
+    }
+  }, [filteredResidents, selected])
+
   const deleteResident = useDeleteResident()
+
+  const toggleStatusFilter = (status: string) => {
+    if (status === 'All') {
+      setStatusFilters([])
+      return
+    }
+    setStatusFilters((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    )
+  }
+
+  const isStatusActive = (status: string) => (
+    status === 'All' ? statusFilters.length === 0 : statusFilters.includes(status)
+  )
 
   const handleEdit = (r: Resident) => { setEditTarget(r); setShowForm(true) }
   const handleDelete = async (id: number) => {
@@ -78,8 +105,8 @@ export default function ResidentsPage() {
           {STATUS_FILTERS.map(f => (
             <button
               key={f}
-              className={`chip ${statusFilter === f ? 'chip-active' : ''}`}
-              onClick={() => setStatusFilter(f)}
+              className={`chip ${isStatusActive(f) ? 'chip-active' : ''}`}
+              onClick={() => toggleStatusFilter(f)}
             >
               {STATUS_LABELS[f] ?? f}
             </button>
@@ -89,7 +116,7 @@ export default function ResidentsPage() {
           <button className={`view-btn ${view === 'table' ? 'active' : ''}`} onClick={() => setView('table')} title="Table view">☰</button>
           <button className={`view-btn ${view === 'grid' ? 'active' : ''}`} onClick={() => setView('grid')} title="Card view">⊞</button>
         </div>
-        <span className="filter-count">{residents.length} records</span>
+        <span className="filter-count">{filteredResidents.length} records</span>
       </div>
 
       {isLoading ? (
@@ -114,7 +141,7 @@ export default function ResidentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {residents.map(r => (
+                {filteredResidents.map(r => (
                   <tr
                     key={r.id}
                     className={selected?.id === r.id ? 'row-selected' : ''}
@@ -142,7 +169,7 @@ export default function ResidentsPage() {
                     </td>
                   </tr>
                 ))}
-                {residents.length === 0 && (
+                {filteredResidents.length === 0 && (
                   <tr><td colSpan={11} className="empty-row">No residents found in the rolls.</td></tr>
                 )}
               </tbody>
@@ -161,7 +188,7 @@ export default function ResidentsPage() {
       ) : (
         <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
           <div className="cards-grid" style={{ flex: 1 }}>
-            {residents.map(r => (
+            {filteredResidents.map(r => (
               <div
                 key={r.id}
                 className={`person-card ${selected?.id === r.id ? 'selected' : ''}`}
@@ -182,7 +209,7 @@ export default function ResidentsPage() {
                 </div>
               </div>
             ))}
-            {residents.length === 0 && (
+            {filteredResidents.length === 0 && (
               <p style={{ color: 'var(--ink-muted)', fontStyle: 'italic' }}>No residents found.</p>
             )}
           </div>
