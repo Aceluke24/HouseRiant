@@ -1,0 +1,93 @@
+import axios from 'axios'
+import type {
+  Resident, CreateResidentRequest,
+  NotableFigure, CreateNotableFigureRequest,
+  Family,
+  Building, CreateBuildingRequest,
+  EstateTask, CreateTaskRequest,
+  EstateFinances, IncomeSource, CreateIncomeSourceRequest,
+  InventoryItem, CreateInventoryItemRequest,
+  CalendarEvent, CreateCalendarEventRequest,
+} from '../types'
+
+const api = axios.create({
+  baseURL: 'http://localhost:4000/api',
+  headers: { 'Content-Type': 'application/json' },
+})
+
+// ── Families ──────────────────────────────────────────────
+export const familiesApi = {
+  getAll: () => api.get<Family[]>('/families').then(r => r.data),
+  getById: (id: number) => api.get<Family>(`/families/${id}`).then(r => r.data),
+  create: (data: Partial<Family>) => api.post<Family>('/families', data).then(r => r.data),
+  update: (id: number, data: Partial<Family>) => api.put<Family>(`/families/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/families/${id}`),
+}
+
+// ── Residents ─────────────────────────────────────────────
+export const residentsApi = {
+  getAll: (params?: { search?: string; status?: string }) =>
+    api.get<Resident[]>('/residents', { params }).then(r => r.data),
+  getById: (id: number) => api.get<Resident>(`/residents/${id}`).then(r => r.data),
+  create: (data: CreateResidentRequest) => api.post<Resident>('/residents', data).then(r => r.data),
+  update: (id: number, data: CreateResidentRequest) => api.put<Resident>(`/residents/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/residents/${id}`),
+}
+
+// ── Notable Figures ───────────────────────────────────────
+export const notableFiguresApi = {
+  getAll: (params?: { search?: string; relationship?: string }) =>
+    api.get<NotableFigure[]>('/notablefigures', { params }).then(r => r.data),
+  getById: (id: number) => api.get<NotableFigure>(`/notablefigures/${id}`).then(r => r.data),
+  create: (data: CreateNotableFigureRequest) => api.post<NotableFigure>('/notablefigures', data).then(r => r.data),
+  update: (id: number, data: CreateNotableFigureRequest) => api.put<NotableFigure>(`/notablefigures/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/notablefigures/${id}`),
+}
+
+// ── Buildings ─────────────────────────────────────────────
+export const buildingsApi = {
+  getAll: () => api.get<Building[]>('/buildings').then(r => r.data),
+  getById: (id: number) => api.get<Building>(`/buildings/${id}`).then(r => r.data),
+  create: (data: CreateBuildingRequest) => api.post<Building>('/buildings', data).then(r => r.data),
+  update: (id: number, data: CreateBuildingRequest) => api.put<Building>(`/buildings/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/buildings/${id}`),
+}
+
+// ── Tasks ─────────────────────────────────────────────────
+export const tasksApi = {
+  getAll: (params?: { search?: string; status?: string; category?: string }) =>
+    api.get<EstateTask[]>('/tasks', { params }).then(r => r.data),
+  getById: (id: number) => api.get<EstateTask>(`/tasks/${id}`).then(r => r.data),
+  create: (data: CreateTaskRequest) => api.post<EstateTask>('/tasks', data).then(r => r.data),
+  update: (id: number, data: CreateTaskRequest) => api.put<EstateTask>(`/tasks/${id}`, data).then(r => r.data),
+  updateStatus: (id: number, status: string) => api.patch(`/tasks/${id}/status`, JSON.stringify(status)),
+  delete: (id: number) => api.delete(`/tasks/${id}`),
+}
+
+// ── Finances ──────────────────────────────────────────────
+export const financesApi = {
+  get: () => api.get<EstateFinances>('/finances').then(r => r.data),
+  update: (data: EstateFinances) => api.put<EstateFinances>('/finances', data).then(r => r.data),
+  getIncomeSources: () => api.get<IncomeSource[]>('/finances/income').then(r => r.data),
+  createIncomeSource: (data: CreateIncomeSourceRequest) => api.post<IncomeSource>('/finances/income', data).then(r => r.data),
+  updateIncomeSource: (id: number, data: CreateIncomeSourceRequest) => api.put<IncomeSource>(`/finances/income/${id}`, data).then(r => r.data),
+  deleteIncomeSource: (id: number) => api.delete(`/finances/income/${id}`),
+}
+
+// ── Inventory ─────────────────────────────────────────────
+export const inventoryApi = {
+  getAll: (params?: { search?: string; category?: string }) =>
+    api.get<InventoryItem[]>('/inventory', { params }).then(r => r.data),
+  create: (data: CreateInventoryItemRequest) => api.post<InventoryItem>('/inventory', data).then(r => r.data),
+  update: (id: number, data: CreateInventoryItemRequest) => api.put<InventoryItem>(`/inventory/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/inventory/${id}`),
+}
+
+// ── Calendar ──────────────────────────────────────────────
+export const calendarApi = {
+  getAll: (params?: { year?: number; season?: string }) =>
+    api.get<CalendarEvent[]>('/calendar', { params }).then(r => r.data),
+  create: (data: CreateCalendarEventRequest) => api.post<CalendarEvent>('/calendar', data).then(r => r.data),
+  update: (id: number, data: CreateCalendarEventRequest) => api.put<CalendarEvent>(`/calendar/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/calendar/${id}`),
+}

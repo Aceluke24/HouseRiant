@@ -1,0 +1,6 @@
+@HouseRiant_HostAddress = http://localhost:5270
+
+GET {{HouseRiant_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
