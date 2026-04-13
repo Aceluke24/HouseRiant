@@ -37,7 +37,8 @@ public class CalendarController : ControllerBase
             Name = req.Name, Description = req.Description, Type = req.Type,
             Year = req.Year, Season = req.Season, Week = req.Week, Day = req.Day,
             DisplayDate = req.DisplayDate, SortOrder = req.SortOrder,
-            Notes = req.Notes, LinkedTaskId = req.LinkedTaskId
+            Notes = req.Notes, LinkedTaskId = req.LinkedTaskId,
+            ShortLabel = req.ShortLabel, EndWeek = req.EndWeek, EndDay = req.EndDay
         };
         _db.CalendarEvents.Add(ev);
         await _db.SaveChangesAsync();
@@ -53,6 +54,7 @@ public class CalendarController : ControllerBase
         ev.Year = req.Year; ev.Season = req.Season; ev.Week = req.Week; ev.Day = req.Day;
         ev.DisplayDate = req.DisplayDate; ev.SortOrder = req.SortOrder;
         ev.Notes = req.Notes; ev.LinkedTaskId = req.LinkedTaskId;
+        ev.ShortLabel = req.ShortLabel; ev.EndWeek = req.EndWeek; ev.EndDay = req.EndDay;
         await _db.SaveChangesAsync();
         return Ok(ev);
     }

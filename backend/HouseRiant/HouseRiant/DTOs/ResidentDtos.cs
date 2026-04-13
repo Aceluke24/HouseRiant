@@ -23,7 +23,8 @@ public record ResidentResponse(
     string? Notes,
     string? ImageUrl,
     int? FamilyId,
-    string? FamilyName
+    string? FamilyName,
+    int SortOrder
 );
 
 public record CreateResidentRequest(

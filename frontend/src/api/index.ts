@@ -2,7 +2,8 @@ import axios from 'axios'
 import type {
   Resident, CreateResidentRequest,
   NotableFigure, CreateNotableFigureRequest,
-  Family,
+  Family, CreateFamilyRequest,
+  PersonGroup, PersonGroupMember, CreatePersonGroupRequest, AddGroupMemberRequest,
   Building, CreateBuildingRequest,
   EstateTask, CreateTaskRequest,
   EstateFinances, IncomeSource, CreateIncomeSourceRequest,
@@ -19,8 +20,8 @@ const api = axios.create({
 export const familiesApi = {
   getAll: () => api.get<Family[]>('/families').then(r => r.data),
   getById: (id: number) => api.get<Family>(`/families/${id}`).then(r => r.data),
-  create: (data: Partial<Family>) => api.post<Family>('/families', data).then(r => r.data),
-  update: (id: number, data: Partial<Family>) => api.put<Family>(`/families/${id}`, data).then(r => r.data),
+  create: (data: CreateFamilyRequest) => api.post<Family>('/families', data).then(r => r.data),
+  update: (id: number, data: CreateFamilyRequest) => api.put<Family>(`/families/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/families/${id}`),
 }
 
@@ -32,6 +33,7 @@ export const residentsApi = {
   create: (data: CreateResidentRequest) => api.post<Resident>('/residents', data).then(r => r.data),
   update: (id: number, data: CreateResidentRequest) => api.put<Resident>(`/residents/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/residents/${id}`),
+  reorder: (items: { id: number; sortOrder: number }[]) => api.put('/residents/reorder', items),
 }
 
 // ── Notable Figures ───────────────────────────────────────
@@ -42,6 +44,18 @@ export const notableFiguresApi = {
   create: (data: CreateNotableFigureRequest) => api.post<NotableFigure>('/notablefigures', data).then(r => r.data),
   update: (id: number, data: CreateNotableFigureRequest) => api.put<NotableFigure>(`/notablefigures/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/notablefigures/${id}`),
+  reorder: (items: { id: number; sortOrder: number }[]) => api.put('/notablefigures/reorder', items),
+}
+
+// ── Person Groups ─────────────────────────────────────────
+export const personGroupsApi = {
+  getAll: () => api.get<PersonGroup[]>('/persongroups').then(r => r.data),
+  create: (data: CreatePersonGroupRequest) => api.post<PersonGroup>('/persongroups', data).then(r => r.data),
+  update: (id: number, data: CreatePersonGroupRequest) => api.put<PersonGroup>(`/persongroups/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/persongroups/${id}`),
+  getMembers: (id: number) => api.get<PersonGroupMember[]>(`/persongroups/${id}/members`).then(r => r.data),
+  addMember: (id: number, data: AddGroupMemberRequest) => api.post<PersonGroupMember>(`/persongroups/${id}/members`, data).then(r => r.data),
+  removeMember: (groupId: number, memberId: number) => api.delete(`/persongroups/${groupId}/members/${memberId}`),
 }
 
 // ── Buildings ─────────────────────────────────────────────

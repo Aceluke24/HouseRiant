@@ -149,7 +149,7 @@ HouseRiant/
 | Page | Route | Status |
 |------|-------|--------|
 | Residents | `/` | ✅ Complete |
-| Notable Figures | `/notable-figures` | ⬜ Placeholder |
+| Notable Figures | `/notable-figures` |  ✅ Complete  |
 | Families | `/families` | ⬜ Placeholder |
 | Buildings | `/buildings` | ⬜ Placeholder |
 | Tasks | `/tasks` | ⬜ Placeholder |

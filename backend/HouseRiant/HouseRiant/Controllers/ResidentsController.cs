@@ -36,8 +36,22 @@ public class ResidentsController : ControllerBase
         if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<PersonStatus>(status, out var s))
             query = query.Where(r => r.Status == s);
 
-        var residents = await query.OrderBy(r => r.Name).ToListAsync();
+        var residents = await query.OrderBy(r => r.SortOrder).ThenBy(r => r.Name).ToListAsync();
         return Ok(residents.Select(ToResponse));
+    }
+
+    [HttpPut("reorder")]
+    public async Task<IActionResult> Reorder([FromBody] List<ReorderItem> items)
+    {
+        var ids = items.Select(i => i.Id).ToList();
+        var residents = await _db.Residents.Where(r => ids.Contains(r.Id)).ToListAsync();
+        foreach (var item in items)
+        {
+            var r = residents.FirstOrDefault(r => r.Id == item.Id);
+            if (r != null) r.SortOrder = item.SortOrder;
+        }
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 
     [HttpGet("{id}")]
@@ -108,7 +122,7 @@ public class ResidentsController : ControllerBase
         r.Id, r.Name, r.Status.ToString(), r.StatusOther, r.Title, r.Role,
         r.Type, r.Race, r.KrellTribe, r.Gender?.ToString(), r.Age, r.DailyPayRate,
         r.LandOwned, r.Appearance, r.Skills, r.TroopType, r.LevelOfRole,
-        r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name
+        r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name, r.SortOrder
     );
 
     /// <summary>

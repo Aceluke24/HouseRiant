@@ -10,16 +10,36 @@ export type TaskCategory = 'Construction' | 'Recruitment' | 'Procurement' | 'Mil
 export type InventoryCategory = 'Animals' | 'Weapons' | 'Tools' | 'Materials' | 'Food' | 'Documents' | 'Clothing' | 'Other'
 export type InventoryCondition = 'Poor' | 'Fair' | 'Good' | 'Excellent'
 export type CalendarEventType = 'Deadline' | 'Battle' | 'Festival' | 'TaskEvent' | 'Note' | 'Other'
+export type FamilyRelationship = 'Ally' | 'Friend' | 'Neutral' | 'Foe' | 'Vassal' | 'Rival' | 'Unknown'
+
 
 // ── Families ──────────────────────────────────────────────
 
 export interface Family {
   id: number
   name: string
-  allegiance?: string
+  origin?: string          // city / region they hail from
+  expertise?: string       // what the family is known for
+  motto?: string           // house motto
+  headOfFamily?: string    // name of the current head
+  relationship?: string    // relationship to House Riant
+  allegiance?: string      // legacy field, keep for existing data
   notes?: string
+  residentCount?: number   // computed by backend
+  notableFigureCount?: number
   residents?: Resident[]
   notableFigures?: NotableFigure[]
+}
+
+export interface CreateFamilyRequest {
+  name: string
+  origin?: string
+  expertise?: string
+  motto?: string
+  headOfFamily?: string
+  relationship?: string
+  allegiance?: string
+  notes?: string
 }
 
 // ── Residents ─────────────────────────────────────────────
@@ -46,6 +66,7 @@ export interface Resident {
   notes?: string
   familyId?: number
   familyName?: string
+  sortOrder?: number
 }
 
 export interface CreateResidentRequest {
@@ -79,6 +100,7 @@ export interface NotableFigure {
   role?: string
   type?: string
   race?: string
+  krellTribe?: string
   gender?: Gender
   age?: number
   location?: string
@@ -90,8 +112,10 @@ export interface NotableFigure {
   firstMet?: string
   lastSeen?: string
   notes?: string
+  imageUrl?: string
   familyId?: number
   familyName?: string
+  sortOrder?: number
 }
 
 export interface CreateNotableFigureRequest {
@@ -100,6 +124,7 @@ export interface CreateNotableFigureRequest {
   role?: string
   type?: string
   race?: string
+  krellTribe?: string
   gender?: Gender
   age?: number
   location?: string
@@ -111,7 +136,40 @@ export interface CreateNotableFigureRequest {
   firstMet?: string
   lastSeen?: string
   notes?: string
+  imageUrl?: string
   familyId?: number
+}
+
+// ── Person Groups ─────────────────────────────────────────
+
+export interface PersonGroup {
+  id: number
+  name: string
+  description?: string
+  color?: string
+  memberCount?: number
+}
+
+export interface PersonGroupMember {
+  id: number
+  groupId: number
+  residentId?: number
+  residentName?: string
+  residentImageUrl?: string
+  notableFigureId?: number
+  notableFigureName?: string
+  notableFigureImageUrl?: string
+}
+
+export interface CreatePersonGroupRequest {
+  name: string
+  description?: string
+  color?: string
+}
+
+export interface AddGroupMemberRequest {
+  residentId?: number
+  notableFigureId?: number
 }
 
 // ── Buildings ─────────────────────────────────────────────
@@ -275,6 +333,9 @@ export interface CalendarEvent {
   sortOrder: number
   notes?: string
   linkedTaskId?: number
+  shortLabel?: string   // custom short text shown in the grid (falls back to name)
+  endWeek?: string      // end week for multi-day events (null = same week as start)
+  endDay?: number       // end day 1-9 (null = same day as start)
 }
 
 export interface CreateCalendarEventRequest {
@@ -289,4 +350,7 @@ export interface CreateCalendarEventRequest {
   sortOrder: number
   notes?: string
   linkedTaskId?: number
+  shortLabel?: string
+  endWeek?: string
+  endDay?: number
 }

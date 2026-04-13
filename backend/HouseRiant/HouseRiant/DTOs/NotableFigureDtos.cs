@@ -9,6 +9,7 @@ public record NotableFigureResponse(
     string? Role,
     string? Type,
     string? Race,
+    string? KrellTribe,
     string? Gender,
     int? Age,
     string? Location,
@@ -22,7 +23,8 @@ public record NotableFigureResponse(
     string? Notes,
     string? ImageUrl,
     int? FamilyId,
-    string? FamilyName
+    string? FamilyName,
+    int SortOrder
 );
 
 public record CreateNotableFigureRequest(
@@ -31,6 +33,7 @@ public record CreateNotableFigureRequest(
     string? Role,
     string? Type,
     string? Race,
+    string? KrellTribe,
     Gender? Gender,
     int? Age,
     string? Location,

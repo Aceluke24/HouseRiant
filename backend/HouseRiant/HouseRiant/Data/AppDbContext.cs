@@ -16,6 +16,8 @@ public class AppDbContext : DbContext
     public DbSet<IncomeSource> IncomeSources { get; set; }
     public DbSet<Inventory> Inventories { get; set; }
     public DbSet<CalendarEvent> CalendarEvents { get; set; }
+    public DbSet<PersonGroup> PersonGroups { get; set; }
+    public DbSet<PersonGroupMember> PersonGroupMembers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,6 +68,7 @@ public class AppDbContext : DbContext
             e.Property(n => n.Role).IsRequired(false);
             e.Property(n => n.Type).IsRequired(false);
             e.Property(n => n.Race).IsRequired(false);
+            e.Property(n => n.KrellTribe).IsRequired(false);
             e.Property(n => n.Location).IsRequired(false);
             e.Property(n => n.Faction).IsRequired(false);
             e.Property(n => n.Relationship).IsRequired(false);
@@ -176,6 +179,33 @@ public class AppDbContext : DbContext
              .WithMany(t => t.CalendarEvents)
              .HasForeignKey(c => c.LinkedTaskId)
              .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // PersonGroup
+        modelBuilder.Entity<PersonGroup>(e =>
+        {
+            e.HasKey(g => g.Id);
+            e.Property(g => g.Name).IsRequired().HasMaxLength(200);
+            e.Property(g => g.Description).IsRequired(false);
+            e.Property(g => g.Color).IsRequired(false).HasMaxLength(50);
+        });
+
+        // PersonGroupMember
+        modelBuilder.Entity<PersonGroupMember>(e =>
+        {
+            e.HasKey(m => m.Id);
+            e.HasOne(m => m.Group)
+             .WithMany(g => g.Members)
+             .HasForeignKey(m => m.GroupId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.Resident)
+             .WithMany(r => r.GroupMemberships)
+             .HasForeignKey(m => m.ResidentId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.NotableFigure)
+             .WithMany(n => n.GroupMemberships)
+             .HasForeignKey(m => m.NotableFigureId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Seed estate finances

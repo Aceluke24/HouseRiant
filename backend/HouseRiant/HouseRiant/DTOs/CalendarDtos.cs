@@ -13,5 +13,8 @@ public record CreateCalendarEventRequest(
     string DisplayDate,
     int SortOrder,
     string? Notes,
-    int? LinkedTaskId
+    int? LinkedTaskId,
+    string? ShortLabel,
+    string? EndWeek,
+    int? EndDay
 );

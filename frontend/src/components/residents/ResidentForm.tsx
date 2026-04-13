@@ -250,7 +250,7 @@ export default function ResidentForm({ resident, onClose }: Props) {
           {/* Status + Role */}
           <div className="form-grid-2">
             <div className="form-group">
-              <label>Status</label>
+              <label>Estate Status</label>
               <select style={inputStyle} {...register('status')}>
                 {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s] ?? s}</option>)}
               </select>

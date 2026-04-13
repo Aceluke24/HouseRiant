@@ -29,6 +29,13 @@ public class CalendarEvent
 
     public string? Notes { get; set; }
 
+    // Short display label for the calendar grid (optional; falls back to Name)
+    public string? ShortLabel { get; set; }
+
+    // End date for multi-day events (null = single-day)
+    public string? EndWeek { get; set; }   // null for Brón or single-day
+    public int? EndDay { get; set; }       // 1-9, null = same day as Day
+
     public int? LinkedTaskId { get; set; }
     public EstateTask? LinkedTask { get; set; }
 }

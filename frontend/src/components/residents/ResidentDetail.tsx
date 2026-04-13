@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import type { Resident } from '../../types'
+import PortraitLightbox from '../PortraitLightbox'
 
 interface Props {
   resident: Resident
@@ -14,8 +16,15 @@ function Initials({ name }: { name: string }) {
 }
 
 export default function ResidentDetail({ resident: r, onEdit, onDelete, onClose }: Props) {
+  const [lightbox, setLightbox] = useState(false)
+  const imgSrc = r.imageUrl ? (r.imageUrl.startsWith('http') ? r.imageUrl : `http://localhost:4000${r.imageUrl}`) : null
+
   return (
     <div className="detail-panel">
+      {lightbox && imgSrc && (
+        <PortraitLightbox src={imgSrc} alt={r.name} onClose={() => setLightbox(false)} />
+      )}
+
       <div className="detail-header">
         <div>
           <h3>{r.name}</h3>
@@ -24,16 +33,16 @@ export default function ResidentDetail({ resident: r, onEdit, onDelete, onClose 
         <button className="btn-ghost" onClick={onClose}>✕</button>
       </div>
 
-      <div className="detail-portrait">
-        {r.imageUrl
-          ? <img src={r.imageUrl?.startsWith('http') ? r.imageUrl : `http://localhost:4000${r.imageUrl}`} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className={`detail-portrait${imgSrc ? ' detail-portrait-clickable' : ''}`} onClick={imgSrc ? () => setLightbox(true) : undefined}>
+        {imgSrc
+          ? <img src={imgSrc} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           : <Initials name={r.name} />
         }
       </div>
 
       <div className="detail-body">
         <DetailRow label="Role" value={r.role} />
-        <DetailRow label="Status" value={r.statusOther ?? r.status} />
+        <DetailRow label="Estate Status" value={r.statusOther ?? r.status} />
         <DetailRow label="Family" value={r.familyName} />
         <DetailRow label="Gender" value={r.gender} />
         <DetailRow label="Age" value={r.age?.toString()} />

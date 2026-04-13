@@ -80,6 +80,12 @@ namespace HouseRiant.Migrations
                     b.Property<string>("DisplayDate")
                         .HasColumnType("text");
 
+                    b.Property<int?>("EndDay")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EndWeek")
+                        .HasColumnType("text");
+
                     b.Property<int?>("LinkedTaskId")
                         .HasColumnType("integer");
 
@@ -95,6 +101,9 @@ namespace HouseRiant.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ShortLabel")
+                        .HasColumnType("text");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
@@ -253,12 +262,27 @@ namespace HouseRiant.Migrations
                     b.Property<string>("Allegiance")
                         .HasColumnType("text");
 
+                    b.Property<string>("Expertise")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HeadOfFamily")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Motto")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
                     b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Origin")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Relationship")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -378,6 +402,9 @@ namespace HouseRiant.Migrations
                     b.Property<bool>("IsAlive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("KrellTribe")
+                        .HasColumnType("text");
+
                     b.Property<string>("LastSeen")
                         .HasColumnType("text");
 
@@ -404,6 +431,9 @@ namespace HouseRiant.Migrations
                     b.Property<string>("Skills")
                         .HasColumnType("text");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -416,6 +446,59 @@ namespace HouseRiant.Migrations
                     b.HasIndex("FamilyId");
 
                     b.ToTable("NotableFigures");
+                });
+
+            modelBuilder.Entity("HouseRhiant.Api.Models.PersonGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonGroups");
+                });
+
+            modelBuilder.Entity("HouseRhiant.Api.Models.PersonGroupMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("NotableFigureId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ResidentId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("NotableFigureId");
+
+                    b.HasIndex("ResidentId");
+
+                    b.ToTable("PersonGroupMembers");
                 });
 
             modelBuilder.Entity("HouseRhiant.Api.Models.Resident", b =>
@@ -470,6 +553,9 @@ namespace HouseRiant.Migrations
 
                     b.Property<string>("Skills")
                         .HasColumnType("text");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -539,6 +625,31 @@ namespace HouseRiant.Migrations
                     b.Navigation("Family");
                 });
 
+            modelBuilder.Entity("HouseRhiant.Api.Models.PersonGroupMember", b =>
+                {
+                    b.HasOne("HouseRhiant.Api.Models.PersonGroup", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HouseRhiant.Api.Models.NotableFigure", "NotableFigure")
+                        .WithMany("GroupMemberships")
+                        .HasForeignKey("NotableFigureId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("HouseRhiant.Api.Models.Resident", "Resident")
+                        .WithMany("GroupMemberships")
+                        .HasForeignKey("ResidentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Group");
+
+                    b.Navigation("NotableFigure");
+
+                    b.Navigation("Resident");
+                });
+
             modelBuilder.Entity("HouseRhiant.Api.Models.Resident", b =>
                 {
                     b.HasOne("HouseRhiant.Api.Models.Family", "Family")
@@ -568,8 +679,20 @@ namespace HouseRiant.Migrations
                     b.Navigation("Tasks");
                 });
 
+            modelBuilder.Entity("HouseRhiant.Api.Models.NotableFigure", b =>
+                {
+                    b.Navigation("GroupMemberships");
+                });
+
+            modelBuilder.Entity("HouseRhiant.Api.Models.PersonGroup", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("HouseRhiant.Api.Models.Resident", b =>
                 {
+                    b.Navigation("GroupMemberships");
+
                     b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618

@@ -35,8 +35,22 @@ public class NotableFiguresController : ControllerBase
         if (!string.IsNullOrWhiteSpace(relationship))
             query = query.Where(n => n.Relationship == relationship);
  
-        var figures = await query.OrderBy(n => n.Name).ToListAsync();
+        var figures = await query.OrderBy(n => n.SortOrder).ThenBy(n => n.Name).ToListAsync();
         return Ok(figures.Select(ToResponse));
+    }
+
+    [HttpPut("reorder")]
+    public async Task<IActionResult> Reorder([FromBody] List<ReorderItem> items)
+    {
+        var ids = items.Select(i => i.Id).ToList();
+        var figures = await _db.NotableFigures.Where(n => ids.Contains(n.Id)).ToListAsync();
+        foreach (var item in items)
+        {
+            var n = figures.FirstOrDefault(n => n.Id == item.Id);
+            if (n != null) n.SortOrder = item.SortOrder;
+        }
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
  
     [HttpGet("{id}")]
@@ -53,10 +67,11 @@ public class NotableFiguresController : ControllerBase
         var figure = new NotableFigure
         {
             Name = req.Name, Title = req.Title, Role = req.Role, Type = req.Type,
-            Race = req.Race, Gender = req.Gender, Age = req.Age, Location = req.Location,
+            Race = req.Race, KrellTribe = req.Race == "Krell" ? req.KrellTribe : null,
+            Gender = req.Gender, Age = req.Age, Location = req.Location,
             Faction = req.Faction, Relationship = req.Relationship, Appearance = req.Appearance,
             Skills = req.Skills, IsAlive = req.IsAlive, FirstMet = req.FirstMet,
-            LastSeen = req.LastSeen, Notes = req.Notes, FamilyId = req.FamilyId
+            LastSeen = req.LastSeen, Notes = req.Notes, ImageUrl = req.ImageUrl, FamilyId = req.FamilyId
         };
         _db.NotableFigures.Add(figure);
         await _db.SaveChangesAsync();
@@ -70,11 +85,14 @@ public class NotableFiguresController : ControllerBase
         var figure = await _db.NotableFigures.Include(n => n.Family).FirstOrDefaultAsync(n => n.Id == id);
         if (figure is null) return NotFound();
         figure.Name = req.Name; figure.Title = req.Title; figure.Role = req.Role;
-        figure.Type = req.Type; figure.Race = req.Race; figure.Gender = req.Gender;
+        figure.Type = req.Type; figure.Race = req.Race;
+        figure.KrellTribe = req.Race == "Krell" ? req.KrellTribe : null;
+        figure.Gender = req.Gender;
         figure.Age = req.Age; figure.Location = req.Location; figure.Faction = req.Faction;
         figure.Relationship = req.Relationship; figure.Appearance = req.Appearance;
         figure.Skills = req.Skills; figure.IsAlive = req.IsAlive; figure.FirstMet = req.FirstMet;
-        figure.LastSeen = req.LastSeen; figure.Notes = req.Notes; figure.FamilyId = req.FamilyId;
+        figure.LastSeen = req.LastSeen; figure.Notes = req.Notes; figure.ImageUrl = req.ImageUrl;
+        figure.FamilyId = req.FamilyId;
         await _db.SaveChangesAsync();
         await _db.Entry(figure).Reference(n => n.Family).LoadAsync();
         return Ok(ToResponse(figure));
@@ -91,8 +109,8 @@ public class NotableFiguresController : ControllerBase
     }
  
     private static NotableFigureResponse ToResponse(NotableFigure n) => new(
-        n.Id, n.Name, n.Title, n.Role, n.Type, n.Race, n.Gender?.ToString(),
+        n.Id, n.Name, n.Title, n.Role, n.Type, n.Race, n.KrellTribe, n.Gender?.ToString(),
         n.Age, n.Location, n.Faction, n.Relationship, n.Appearance, n.Skills,
-        n.IsAlive, n.FirstMet, n.LastSeen, n.Notes, n.ImageUrl, n.FamilyId, n.Family?.Name
+        n.IsAlive, n.FirstMet, n.LastSeen, n.Notes, n.ImageUrl, n.FamilyId, n.Family?.Name, n.SortOrder
     );
 }

@@ -517,6 +517,39 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* ── Portrait Lightbox ──────────────────────────────────── */
+.lightbox-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(14,26,46,0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  cursor: zoom-out;
+  padding: 2rem;
+}
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 88vh;
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--gold);
+  box-shadow: 0 24px 80px rgba(14,26,46,0.5);
+  object-fit: contain;
+  cursor: default;
+}
+.lightbox-close {
+  position: absolute; top: 1.25rem; right: 1.5rem;
+  background: rgba(14,26,46,0.7);
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  font-size: 18px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.lightbox-close:hover { background: rgba(14,26,46,0.95); color: var(--white); }
+.detail-portrait-clickable { cursor: zoom-in; }
+
 /* ── Forms ─────────────────────────────────────────────── */
 .form-group { margin-bottom: 0.9rem; }
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
@@ -605,6 +638,178 @@ textarea { resize: vertical; min-height: 70px; }
 .amount-positive { color: var(--success); font-weight: 500; }
 .amount-negative { color: var(--danger); font-weight: 500; }
 
+/* ── Calendar ──────────────────────────────────────────── */
+
+/* Battle badge (not in core set) */
+.badge-battle { background: rgba(192,64,32,0.1); color: #c04020; border: 1px solid rgba(192,64,32,0.3); }
+
+/* Year navigation */
+.cal-year-nav { display: flex; align-items: center; gap: 4px; }
+.cal-year-label {
+  font-family: 'Cinzel', serif; font-size: 15px;
+  color: var(--blue-royal); font-weight: 500;
+  min-width: 70px; text-align: center;
+}
+.cal-year-btn {
+  font-size: 18px; padding: 2px 8px;
+  color: var(--ink-muted);
+}
+.cal-year-btn:hover { color: var(--blue-royal); }
+
+/* Season chips */
+.chip-bron { font-style: italic; }
+
+/* Season block */
+.cal-season-block { margin-bottom: 2rem; }
+.cal-season-heading {
+  font-family: 'Cinzel', serif; font-size: 14px;
+  color: var(--blue-royal); letter-spacing: 0.05em;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border-mid);
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.cal-season-heading-current {
+  border-bottom-color: var(--gold);
+  color: var(--gold);
+}
+.cal-season-tag {
+  font-family: 'EB Garamond', serif; font-size: 11px;
+  font-style: italic; color: var(--ink-muted);
+  background: var(--parchment2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1px 8px;
+}
+.cal-season-tag-current {
+  background: var(--gold-pale); border-color: var(--border-gold); color: #6b5000;
+}
+
+/* Calendar grid */
+.cal-grid {
+  display: grid;
+  grid-template-columns: 72px repeat(9, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.cal-grid-bron {
+  grid-template-columns: 72px repeat(9, 1fr);
+}
+
+/* Day number header */
+.cal-day-header {
+  background: var(--blue-deep);
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  text-align: center;
+  padding: 4px 2px;
+}
+
+/* Week label cell */
+.cal-week-label {
+  background: var(--blue-royal);
+  color: rgba(255,255,255,0.75);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  display: flex; align-items: center;
+  padding: 4px 6px;
+  line-height: 1.3;
+}
+
+/* Day cell */
+.cal-cell {
+  background: var(--white);
+  min-height: 52px;
+  padding: 4px 5px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.1s;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.cal-cell:hover { background: var(--blue-ghost); }
+.cal-cell-has-events { background: var(--parchment); }
+.cal-cell-has-events:hover { background: var(--blue-ghost); }
+.cal-cell-today {
+  background: var(--gold-pale) !important;
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+.cal-cell-today:hover { background: var(--gold-pale) !important; }
+
+/* Today display in toolbar */
+.cal-today-display {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--gold-ghost);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.cal-today-label {
+  font-family: 'Cinzel', serif; font-size: 10px;
+  color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em;
+}
+.cal-today-date { color: var(--ink); font-style: italic; }
+.cal-today-edit-btn { font-size: 12px; padding: 0 2px; color: var(--ink-muted); }
+.cal-today-edit-btn:hover { color: var(--blue-royal); }
+
+/* Set-as-today button on cells */
+.cal-set-today-btn {
+  display: none;
+  position: absolute;
+  top: 2px; right: 3px;
+  font-size: 9px;
+  background: none; border: none;
+  cursor: pointer;
+  padding: 0; line-height: 1;
+  opacity: 0.6;
+}
+.cal-cell:hover .cal-set-today-btn { display: block; }
+.cal-cell-today .cal-set-today-btn { display: none !important; }
+.cal-set-today-btn:hover { opacity: 1; }
+
+/* Day number inside cell */
+.cal-day-num {
+  font-family: 'Cinzel', serif;
+  font-size: 10px; color: var(--ink-muted);
+  line-height: 1;
+}
+.cal-cell-today .cal-day-num { color: var(--gold); font-weight: 600; }
+
+/* Event chips */
+.cal-chips { display: flex; flex-direction: column; gap: 2px; margin-top: 2px; }
+
+.cal-chip {
+  display: block;
+  font-size: 9px;
+  font-family: 'EB Garamond', Georgia, serif;
+  padding: 2px 4px;
+  min-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  line-height: 1.2;
+  color: var(--white);
+  user-select: none;
+}
+.cal-chip-solo  { border-radius: 3px; }
+.cal-chip-start { border-radius: 3px 0 0 3px; }
+.cal-chip-mid   { border-radius: 0; margin-left: -1px; margin-right: -1px; }
+.cal-chip-end   { border-radius: 0 3px 3px 0; }
+
+.cal-chip-label { pointer-events: none; }
+
+.cal-chip-deadline  { background: var(--danger); }
+.cal-chip-battle    { background: #c04020; }
+.cal-chip-festival  { background: var(--gold); color: var(--ink); }
+.cal-chip-task      { background: var(--success); }
+.cal-chip-note      { background: var(--blue-mid); }
+.cal-chip-other     { background: var(--ink-muted); }
+
 /* ── Form consistency ──────────────────────────────────── */
 .modal-form input[type=text],
 .modal-form input[type=number],
@@ -633,4 +838,331 @@ textarea { resize: vertical; min-height: 70px; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0 1.25rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOCUS VIEW — styles to append to the bottom of styles.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Focus checkbox in table rows ──────────────────────────── */
+
+/* The ○ / 🎯 icon in the first column of the residents table */
+.focus-checkbox {
+  font-size: 15px;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s, transform 0.15s;
+  user-select: none;
+  display: inline-block;
+}
+.focus-checkbox:hover { opacity: 0.7; transform: scale(1.2); }
+.focus-checkbox-active { opacity: 1; }
+
+/* Subtle gold left border on rows that are in focus */
+.row-focused td:first-child { border-left: 3px solid var(--gold); }
+
+/* ── Focus button on cards (grid view) ─────────────────────── */
+
+/* Wraps the person-card in relative positioning so we can
+   absolutely place the focus button in the top-right corner */
+.person-card { position: relative; }
+
+.card-focus-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.15s, transform 0.15s;
+  line-height: 1;
+  padding: 2px;
+}
+.card-focus-btn:hover { opacity: 0.8; transform: scale(1.2); }
+.card-focus-btn-active { opacity: 1; }
+
+/* Gold ring on cards that are in focus */
+.person-card-focused {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px var(--gold-pale);
+}
+
+/* ── Floating focus bar ─────────────────────────────────────── */
+
+/* The bar that floats at the bottom of the viewport when
+   at least one character is selected */
+.focus-bar {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Sits above all page content */
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+
+  background: var(--blue-deep);
+  border: 1px solid rgba(200,160,32,0.4);
+  border-radius: var(--radius-xl);
+  padding: 0.65rem 1rem;
+  box-shadow: 0 8px 32px rgba(14,26,46,0.35);
+
+  min-width: 480px;
+  max-width: 860px;
+  width: max-content;
+}
+
+.focus-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.focus-bar-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.focus-bar-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: 480px;
+  /* Hide scrollbar but allow scroll if many chips */
+  scrollbar-width: none;
+}
+.focus-bar-chips::-webkit-scrollbar { display: none; }
+
+/* Each selected character appears as a small pill in the bar */
+.focus-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(200,160,32,0.15);
+  border: 1px solid rgba(200,160,32,0.3);
+  border-radius: 20px;
+  padding: 3px 8px 3px 6px;
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+  color: var(--gold-light);
+  white-space: nowrap;
+}
+
+.focus-chip-type { font-size: 11px; opacity: 0.7; }
+
+.focus-chip-remove {
+  background: none;
+  border: none;
+  color: var(--gold-light);
+  font-size: 9px;
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 0 0 0 2px;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+.focus-chip-remove:hover { opacity: 1; }
+
+.focus-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.focus-bar-count {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* Override btn-ghost for the dark bar background */
+.focus-bar-clear {
+  color: var(--ink-faint) !important;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+}
+.focus-bar-clear:hover { color: var(--white) !important; }
+
+/* ── Focus View page ────────────────────────────────────────── */
+
+/* Give the focus page full height and no max-width cap so profiles
+   can spread across the full screen */
+.focus-page {
+  max-width: none !important;
+  /* Extra bottom padding so the floating bar doesn't overlap profiles */
+  padding-bottom: 5rem !important;
+}
+
+/* Scroll layout: profiles sit in a horizontal scrollable row,
+   each card keeps its natural width */
+.focus-row-scroll {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+}
+
+/* Fit layout: profiles fill the available width using a CSS grid
+   that shrinks columns to fit everything on screen */
+.focus-row-fit {
+  display: grid;
+  /* Each column is at least 260px but can grow equally to fill space */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+/* ── Individual profile card on Focus View ──────────────────── */
+
+/* Inherits all .detail-panel styling but gets a fixed width in
+   scroll mode (the grid handles sizing in fit mode) */
+.focus-profile-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  /* Fixed width in scroll mode — wide enough to show all detail rows */
+  min-width: 280px;
+  width: 300px;
+
+  /* In fit mode the grid overrides this width automatically */
+}
+
+/* Loading/error placeholder keeps the same card shape */
+.focus-profile-loading,
+.focus-profile-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 1px dashed var(--border-mid);
+  background: var(--parchment);
+}
+
+/* Small type badge under the name (Resident vs Notable Figure) */
+.focus-type-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ── Empty state on Focus View ──────────────────────────────── */
+
+.focus-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.focus-empty-icon { font-size: 48px; opacity: 0.3; }
+
+.focus-empty h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  color: var(--blue-royal);
+  font-weight: 500;
+}
+
+.focus-empty p {
+  font-size: 14px;
+  max-width: 400px;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Collapsed card state ───────────────────────────────────── */
+
+/* When collapsed, the card shrinks to a narrow fixed width so
+   many cards can sit side by side without taking up much room */
+.focus-profile-card-collapsed {
+  width: 220px;
+  min-width: 220px;
+}
+
+/* The collapsed body: portrait on the left, text on the right */
+.focus-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+/* Smaller portrait circle in collapsed mode */
+.focus-collapsed-portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--blue-pale);
+  border: 2px solid var(--gold);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.focus-collapsed-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.focus-collapsed-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0; /* allows text to truncate */
+}
+
+.focus-collapsed-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.focus-collapsed-title {
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.focus-collapsed-role {
+  font-size: 12px;
+  color: var(--ink-mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

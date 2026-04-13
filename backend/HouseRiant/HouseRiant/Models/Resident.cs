@@ -38,8 +38,10 @@ public class Resident
     public string? LevelOfRole { get; set; }
     public string? Notes { get; set; }
     public string? ImageUrl { get; set; }
+    public int SortOrder { get; set; } = 0;
 
     public int? FamilyId { get; set; }
     public Family? Family { get; set; }
     public ICollection<EstateTask> Tasks { get; set; } = new List<EstateTask>();
+    public ICollection<PersonGroupMember> GroupMemberships { get; set; } = new List<PersonGroupMember>();
 }
