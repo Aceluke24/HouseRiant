@@ -18,7 +18,7 @@ public class ResidentsController : ControllerBase
         [FromQuery] string? search,
         [FromQuery] string? status)
     {
-        var query = _db.Residents.Include(r => r.Family).AsQueryable();
+        var query = _db.Residents.Include(r => r.Family).Include(r => r.Building).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -57,7 +57,7 @@ public class ResidentsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ResidentResponse>> GetById(int id)
     {
-        var r = await _db.Residents.Include(r => r.Family).FirstOrDefaultAsync(r => r.Id == id);
+        var r = await _db.Residents.Include(r => r.Family).Include(r => r.Building).FirstOrDefaultAsync(r => r.Id == id);
         if (r is null) return NotFound();
         return Ok(ToResponse(r));
     }
@@ -82,13 +82,14 @@ public class ResidentsController : ControllerBase
         _db.Residents.Add(resident);
         await _db.SaveChangesAsync();
         await _db.Entry(resident).Reference(r => r.Family).LoadAsync();
+        await _db.Entry(resident).Reference(r => r.Building).LoadAsync();
         return CreatedAtAction(nameof(GetById), new { id = resident.Id }, ToResponse(resident));
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<ResidentResponse>> Update(int id, [FromBody] CreateResidentRequest req)
     {
-        var resident = await _db.Residents.Include(r => r.Family).FirstOrDefaultAsync(r => r.Id == id);
+        var resident = await _db.Residents.Include(r => r.Family).Include(r => r.Building).FirstOrDefaultAsync(r => r.Id == id);
         if (resident is null) return NotFound();
 
         var familyId = await NormalizeAndValidateFamilyId(req.FamilyId);
@@ -105,6 +106,7 @@ public class ResidentsController : ControllerBase
         resident.Notes = req.Notes; resident.ImageUrl = req.ImageUrl; resident.FamilyId = familyId;
         await _db.SaveChangesAsync();
         await _db.Entry(resident).Reference(r => r.Family).LoadAsync();
+        await _db.Entry(resident).Reference(r => r.Building).LoadAsync();
         return Ok(ToResponse(resident));
     }
 
@@ -122,7 +124,8 @@ public class ResidentsController : ControllerBase
         r.Id, r.Name, r.Status.ToString(), r.StatusOther, r.Title, r.Role,
         r.Type, r.Race, r.KrellTribe, r.Gender?.ToString(), r.Age, r.DailyPayRate,
         r.LandOwned, r.Appearance, r.Skills, r.TroopType, r.LevelOfRole,
-        r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name, r.SortOrder
+        r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name, r.SortOrder,
+        r.BuildingId, r.Building?.Name
     );
 
     /// <summary>

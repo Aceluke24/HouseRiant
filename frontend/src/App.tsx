@@ -10,6 +10,7 @@ import FamiliesPage from './pages/FamiliesPage'
 import NotableFiguresPage from './pages/NotableFiguresPage'
 import GroupsPage from './pages/GroupsPage'
 import CalendarPage from './pages/CalendarPage'
+import BuildingsPage from './pages/BuildingsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,7 +70,7 @@ export default function App() {
                 <Route path="/notable-figures" element={<NotableFiguresPage />} />
                 <Route path="/families" element={<FamiliesPage />} />
                 <Route path="/groups" element={<GroupsPage />} />
-                <Route path="/buildings" element={<Placeholder title="Buildings" />} />
+                <Route path="/buildings" element={<BuildingsPage />} />
                 <Route path="/tasks" element={<Placeholder title="Tasks" />} />
                 <Route path="/inventory" element={<Placeholder title="Inventory" />} />
                 <Route path="/finances" element={<Placeholder title="Finances" />} />

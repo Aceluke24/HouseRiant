@@ -3,6 +3,7 @@ using System;
 using HouseRhiant.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HouseRiant.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260418024329_AddBuildingImageAndResidents")]
+    partial class AddBuildingImageAndResidents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,10 +43,6 @@ namespace HouseRiant.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImagePosition")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
@@ -68,33 +67,6 @@ namespace HouseRiant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Buildings");
-                });
-
-            modelBuilder.Entity("HouseRhiant.Api.Models.BuildingAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AssignmentType")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("BuildingId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ResidentId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildingId");
-
-                    b.HasIndex("ResidentId");
-
-                    b.ToTable("BuildingAssignments");
                 });
 
             modelBuilder.Entity("HouseRhiant.Api.Models.CalendarEvent", b =>
@@ -620,25 +592,6 @@ namespace HouseRiant.Migrations
                     b.ToTable("Residents");
                 });
 
-            modelBuilder.Entity("HouseRhiant.Api.Models.BuildingAssignment", b =>
-                {
-                    b.HasOne("HouseRhiant.Api.Models.Building", "Building")
-                        .WithMany("Assignments")
-                        .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HouseRhiant.Api.Models.Resident", "Resident")
-                        .WithMany("BuildingAssignments")
-                        .HasForeignKey("ResidentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Building");
-
-                    b.Navigation("Resident");
-                });
-
             modelBuilder.Entity("HouseRhiant.Api.Models.CalendarEvent", b =>
                 {
                     b.HasOne("HouseRhiant.Api.Models.EstateTask", "LinkedTask")
@@ -727,8 +680,6 @@ namespace HouseRiant.Migrations
 
             modelBuilder.Entity("HouseRhiant.Api.Models.Building", b =>
                 {
-                    b.Navigation("Assignments");
-
                     b.Navigation("Residents");
 
                     b.Navigation("Tasks");
@@ -760,8 +711,6 @@ namespace HouseRiant.Migrations
 
             modelBuilder.Entity("HouseRhiant.Api.Models.Resident", b =>
                 {
-                    b.Navigation("BuildingAssignments");
-
                     b.Navigation("GroupMemberships");
 
                     b.Navigation("Tasks");

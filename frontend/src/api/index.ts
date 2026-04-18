@@ -65,6 +65,11 @@ export const buildingsApi = {
   create: (data: CreateBuildingRequest) => api.post<Building>('/buildings', data).then(r => r.data),
   update: (id: number, data: CreateBuildingRequest) => api.put<Building>(`/buildings/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/buildings/${id}`),
+  assignResident: (id: number, residentId: number) => api.post(`/buildings/${id}/residents/${residentId}`),
+  unassignResident: (id: number, residentId: number) => api.delete(`/buildings/${id}/residents/${residentId}`),
+  addAssignment: (id: number, data: { residentId: number; assignmentType?: string }) =>
+    api.post(`/buildings/${id}/assignments`, data).then(r => r.data),
+  removeAssignment: (id: number, assignmentId: number) => api.delete(`/buildings/${id}/assignments/${assignmentId}`),
 }
 
 // ── Tasks ─────────────────────────────────────────────────

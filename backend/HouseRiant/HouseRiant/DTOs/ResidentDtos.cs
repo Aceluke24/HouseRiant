@@ -24,7 +24,9 @@ public record ResidentResponse(
     string? ImageUrl,
     int? FamilyId,
     string? FamilyName,
-    int SortOrder
+    int SortOrder,
+    int? BuildingId,
+    string? BuildingName
 );
 
 public record CreateResidentRequest(

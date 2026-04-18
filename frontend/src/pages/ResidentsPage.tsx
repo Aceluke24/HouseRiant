@@ -61,7 +61,7 @@ export default function ResidentsPage() {
   const [sortBy, setSortBy] = useState<SortField>('custom')
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
   const [view, setView] = useState<'table' | 'grid'>('table')
-  const [selected, setSelected] = useState<Resident | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<Resident | undefined>()
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
@@ -98,6 +98,9 @@ export default function ResidentsPage() {
     return result
   }, [residents, statusFilters, groupMemberIds])
 
+  // Derive selected from live data so the detail panel auto-updates after mutations
+  const selected = selectedId != null ? (residents.find(r => r.id === selectedId) ?? null) : null
+
   // Apply client-side sort
   const displayResidents = useMemo(() => {
     // Use localOrder for drag preview when sorting by custom and no filters
@@ -111,9 +114,9 @@ export default function ResidentsPage() {
   }, [filteredResidents])
 
   useEffect(() => {
-    if (!selected) return
-    if (!filteredResidents.some(r => r.id === selected.id)) setSelected(null)
-  }, [filteredResidents, selected])
+    if (selectedId == null) return
+    if (!filteredResidents.some(r => r.id === selectedId)) setSelectedId(null)
+  }, [filteredResidents, selectedId])
 
   const deleteResident = useDeleteResident()
 
@@ -128,7 +131,7 @@ export default function ResidentsPage() {
   const handleConfirmDelete = async () => {
     if (confirmDeleteId == null) return
     await deleteResident.mutateAsync(confirmDeleteId)
-    if (selected?.id === confirmDeleteId) setSelected(null)
+    if (selectedId === confirmDeleteId) setSelectedId(null)
     setConfirmDeleteId(null)
   }
   const handleFormClose = () => { setShowForm(false); setEditTarget(undefined) }
@@ -295,7 +298,7 @@ export default function ResidentsPage() {
                       onDragStart={e => handleDragStart(e, r.id)}
                       onDragOver={e => handleDragOver(e, r.id)}
                       onDragEnd={handleDragEnd}
-                      onClick={() => setSelected(r)}
+                      onClick={() => setSelectedId(r.id)}
                       style={{ opacity: dragIdRef.current === r.id ? 0.5 : 1 }}
                     >
                       {isDraggable && (
@@ -348,7 +351,7 @@ export default function ResidentsPage() {
               resident={selected}
               onEdit={() => handleEdit(selected)}
               onDelete={() => handleDelete(selected.id)}
-              onClose={() => setSelected(null)}
+              onClose={() => setSelectedId(null)}
             />
           )}
         </div>
@@ -361,7 +364,7 @@ export default function ResidentsPage() {
                 <div
                   key={r.id}
                   className={`person-card ${selected?.id === r.id ? 'selected' : ''} ${focused ? 'person-card-focused' : ''}`}
-                  onClick={() => setSelected(r)}
+                  onClick={() => setSelectedId(r.id)}
                 >
                   <button
                     className={`card-focus-btn ${focused ? 'card-focus-btn-active' : ''}`}
@@ -395,7 +398,7 @@ export default function ResidentsPage() {
               resident={selected}
               onEdit={() => handleEdit(selected)}
               onDelete={() => handleDelete(selected.id)}
-              onClose={() => setSelected(null)}
+              onClose={() => setSelectedId(null)}
             />
           )}
         </div>

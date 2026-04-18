@@ -210,7 +210,7 @@ dotnet ef database update
 | Focus View      | `/focus`          | ✅ Complete          |
 | Families        | `/families`       | ✅ Complete          |
 | Notable Figures | `/notable-figures`| ✅ Complete          |
-| Buildings       | `/buildings`      | ⬜ Placeholder       |
+| Buildings       | `/buildings`      | ✅ Complete          |
 | Tasks           | `/tasks`          | ⬜ Placeholder       |
 | Inventory       | `/inventory`      | ⬜ Placeholder       |
 | Finances        | `/finances`       | ⬜ Placeholder       |
@@ -218,9 +218,9 @@ dotnet ef database update
 
 ### Build order (dependencies first)
 1. ~~Families~~ ✅
-2. **Notable Figures** ← next (mirrors Residents, needs Families for dropdown)
-3. Buildings (cards with linked tasks)
-4. Tasks (most complex — links Buildings, Families, Residents)
+2. ~~Notable Figures~~ ✅
+3. ~~Buildings~~ ✅ (cards with linked tasks)
+4. **Tasks** ← next (most complex — links Buildings, Families, Residents)
 5. Inventory (simple table)
 6. Finances (two-section page)
 7. Calendar (most complex — custom date system, links Tasks)

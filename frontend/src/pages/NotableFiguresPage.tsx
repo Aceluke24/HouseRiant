@@ -53,7 +53,7 @@ export default function NotableFiguresPage() {
   const [sortBy, setSortBy] = useState<SortField>('custom')
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
   const [view, setView] = useState<'table' | 'grid'>('table')
-  const [selected, setSelected] = useState<NotableFigure | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<NotableFigure | undefined>()
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
@@ -82,6 +82,9 @@ export default function NotableFiguresPage() {
     return result
   }, [figures, relFilters, aliveFilter, groupMemberIds])
 
+  // Derive selected from live data so the detail panel auto-updates after mutations
+  const selected = selectedId != null ? (figures.find(f => f.id === selectedId) ?? null) : null
+
   const displayFigures = useMemo(() => {
     if (sortBy === 'custom' && localOrder != null) return localOrder
     return sortFigures(filteredFigures, sortBy)
@@ -92,9 +95,9 @@ export default function NotableFiguresPage() {
   }, [filteredFigures])
 
   useEffect(() => {
-    if (!selected) return
-    if (!filteredFigures.some(f => f.id === selected.id)) setSelected(null)
-  }, [filteredFigures, selected])
+    if (selectedId == null) return
+    if (!filteredFigures.some(f => f.id === selectedId)) setSelectedId(null)
+  }, [filteredFigures, selectedId])
 
   const deleteFigure = useDeleteNotableFigure()
 
@@ -109,7 +112,7 @@ export default function NotableFiguresPage() {
   const handleConfirmDelete = async () => {
     if (confirmDeleteId == null) return
     await deleteFigure.mutateAsync(confirmDeleteId)
-    if (selected?.id === confirmDeleteId) setSelected(null)
+    if (selectedId === confirmDeleteId) setSelectedId(null)
     setConfirmDeleteId(null)
   }
   const handleFormClose = () => { setShowForm(false); setEditTarget(undefined) }
@@ -280,7 +283,7 @@ export default function NotableFiguresPage() {
                       onDragStart={e => handleDragStart(e, f.id)}
                       onDragOver={e => handleDragOver(e, f.id)}
                       onDragEnd={handleDragEnd}
-                      onClick={() => setSelected(f)}
+                      onClick={() => setSelectedId(f.id)}
                       style={{ opacity: dragIdRef.current === f.id ? 0.5 : 1 }}
                     >
                       {isDraggable && (
@@ -330,7 +333,7 @@ export default function NotableFiguresPage() {
               figure={selected}
               onEdit={() => handleEdit(selected)}
               onDelete={() => handleDelete(selected.id)}
-              onClose={() => setSelected(null)}
+              onClose={() => setSelectedId(null)}
             />
           )}
         </div>
@@ -341,7 +344,7 @@ export default function NotableFiguresPage() {
               <div
                 key={f.id}
                 className={`person-card ${selected?.id === f.id ? 'selected' : ''}`}
-                onClick={() => setSelected(f)}
+                onClick={() => setSelectedId(f.id)}
               >
                 <Portrait name={f.name} imageUrl={f.imageUrl} size={80} />
                 <div className="card-name">{f.name}</div>
@@ -372,7 +375,7 @@ export default function NotableFiguresPage() {
               figure={selected}
               onEdit={() => handleEdit(selected)}
               onDelete={() => handleDelete(selected.id)}
-              onClose={() => setSelected(null)}
+              onClose={() => setSelectedId(null)}
             />
           )}
         </div>

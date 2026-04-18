@@ -67,6 +67,8 @@ export interface Resident {
   familyId?: number
   familyName?: string
   sortOrder?: number
+  buildingId?: number
+  buildingName?: string
 }
 
 export interface CreateResidentRequest {
@@ -174,6 +176,20 @@ export interface AddGroupMemberRequest {
 
 // ── Buildings ─────────────────────────────────────────────
 
+export interface BuildingResidentSummary {
+  id: number
+  name: string
+  imageUrl?: string
+}
+
+export interface BuildingAssignment {
+  id: number
+  residentId: number
+  residentName: string
+  residentImageUrl?: string
+  assignmentType?: string
+}
+
 export interface Building {
   id: number
   name: string
@@ -183,8 +199,12 @@ export interface Building {
   capacityPersons?: number
   storageCapacityLbs?: number
   isLivable: boolean
+  imageUrl?: string
+  imagePosition?: string    // CSS object-position, e.g. "center", "top left"
   notes?: string
-  tasks?: EstateTask[]
+  tasks?: { id: number; name: string; status: string }[]
+  residents?: BuildingResidentSummary[]
+  assignments?: BuildingAssignment[]
 }
 
 export interface CreateBuildingRequest {
@@ -195,6 +215,8 @@ export interface CreateBuildingRequest {
   capacityPersons?: number
   storageCapacityLbs?: number
   isLivable: boolean
+  imageUrl?: string
+  imagePosition?: string
   notes?: string
 }
 

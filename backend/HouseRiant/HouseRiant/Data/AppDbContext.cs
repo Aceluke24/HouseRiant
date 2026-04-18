@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<CalendarEvent> CalendarEvents { get; set; }
     public DbSet<PersonGroup> PersonGroups { get; set; }
     public DbSet<PersonGroupMember> PersonGroupMembers { get; set; }
+    public DbSet<BuildingAssignment> BuildingAssignments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -57,6 +58,10 @@ public class AppDbContext : DbContext
              .WithMany(f => f.Residents)
              .HasForeignKey(r => r.FamilyId)
              .OnDelete(DeleteBehavior.SetNull);
+            e.HasOne(r => r.Building)
+             .WithMany(b => b.Residents)
+             .HasForeignKey(r => r.BuildingId)
+             .OnDelete(DeleteBehavior.SetNull);
         });
 
         // NotableFigure — only Name required
@@ -91,6 +96,8 @@ public class AppDbContext : DbContext
             e.HasKey(b => b.Id);
             e.Property(b => b.Name).IsRequired().HasMaxLength(200);
             e.Property(b => b.Description).IsRequired(false);
+            e.Property(b => b.ImageUrl).IsRequired(false);
+            e.Property(b => b.ImagePosition).IsRequired(false).HasMaxLength(50);
             e.Property(b => b.Notes).IsRequired(false);
             e.Property(b => b.Type).HasConversion<string>();
             e.Property(b => b.Condition).HasConversion<string>();
@@ -205,6 +212,21 @@ public class AppDbContext : DbContext
             e.HasOne(m => m.NotableFigure)
              .WithMany(n => n.GroupMemberships)
              .HasForeignKey(m => m.NotableFigureId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // BuildingAssignment (secondary many-to-many assignments)
+        modelBuilder.Entity<BuildingAssignment>(e =>
+        {
+            e.HasKey(a => a.Id);
+            e.Property(a => a.AssignmentType).IsRequired(false).HasMaxLength(100);
+            e.HasOne(a => a.Building)
+             .WithMany(b => b.Assignments)
+             .HasForeignKey(a => a.BuildingId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(a => a.Resident)
+             .WithMany(r => r.BuildingAssignments)
+             .HasForeignKey(a => a.ResidentId)
              .OnDelete(DeleteBehavior.Cascade);
         });
 
