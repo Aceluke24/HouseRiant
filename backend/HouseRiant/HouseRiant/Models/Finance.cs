@@ -9,8 +9,6 @@ public class EstateFinances
     public decimal LoanAmountTin { get; set; }
     public decimal TaxRateTin { get; set; }
     public string? TaxNotes { get; set; }
-    public string? CurrentGameDate { get; set; }
-    public string? CurrentSeason { get; set; }
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 }
 

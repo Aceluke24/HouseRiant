@@ -6,7 +6,7 @@ import type {
   PersonGroup, PersonGroupMember, CreatePersonGroupRequest, AddGroupMemberRequest,
   Building, CreateBuildingRequest,
   EstateTask, CreateTaskRequest,
-  EstateFinances, IncomeSource, CreateIncomeSourceRequest,
+  GameState, EstateFinances, IncomeSource, CreateIncomeSourceRequest, UpdateGameDateRequest,
   InventoryItem, CreateInventoryItemRequest,
   CalendarEvent, CreateCalendarEventRequest,
 } from '../types'
@@ -83,6 +83,12 @@ export const tasksApi = {
   delete: (id: number) => api.delete(`/tasks/${id}`),
 }
 
+// ── Game State ────────────────────────────────────────────
+export const gamestateApi = {
+  get: () => api.get<GameState>('/gamestate').then(r => r.data),
+  update: (data: UpdateGameDateRequest) => api.patch<GameState>('/gamestate', data).then(r => r.data),
+}
+
 // ── Finances ──────────────────────────────────────────────
 export const financesApi = {
   get: () => api.get<EstateFinances>('/finances').then(r => r.data),
@@ -109,4 +115,7 @@ export const calendarApi = {
   create: (data: CreateCalendarEventRequest) => api.post<CalendarEvent>('/calendar', data).then(r => r.data),
   update: (id: number, data: CreateCalendarEventRequest) => api.put<CalendarEvent>(`/calendar/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/calendar/${id}`),
+  batchCreate: (events: CreateCalendarEventRequest[]) =>
+    api.post<CalendarEvent[]>('/calendar/batch', { events }).then(r => r.data),
+  deleteGroup: (groupId: number) => api.delete(`/calendar/group/${groupId}`),
 }

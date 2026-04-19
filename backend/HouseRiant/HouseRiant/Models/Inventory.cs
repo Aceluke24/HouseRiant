@@ -9,7 +9,12 @@ public enum InventoryCategory
     Food,
     Documents,
     Clothing,
-    Other
+    Other,
+    Armor,
+    Medicine,
+    MagicItems,
+    Valuables,
+    Equipment
 }
 
 public enum InventoryCondition

@@ -35,3 +35,19 @@ export function useDeleteCalendarEvent() {
     onSuccess: () => qc.invalidateQueries({ queryKey: [CALENDAR_KEY] }),
   })
 }
+
+export function useCreateRecurringCalendarEvents() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (events: CreateCalendarEventRequest[]) => calendarApi.batchCreate(events),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [CALENDAR_KEY] }),
+  })
+}
+
+export function useDeleteCalendarEventGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (groupId: number) => calendarApi.deleteGroup(groupId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [CALENDAR_KEY] }),
+  })
+}

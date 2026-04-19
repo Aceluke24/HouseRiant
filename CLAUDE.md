@@ -176,7 +176,8 @@ dotnet ef database update
 **NotableFigures** — `id, name, title, role, type, race, gender, age, location, faction, relationship, appearance, skills, isAlive, firstMet, lastSeen, notes, imageUrl, familyId`
 **Buildings** — `id, name, type, description, condition, capacityPersons, storageCapacityLbs, isLivable, notes`
 **EstateTask** — `id, name, description, status, priority, category, costTin, paymentMethod, paymentNotes, targetDate, completedDate, requirements, outcome, notes, buildingId, assignedFamilyId, assignedResidentId`
-**EstateFinances** — single row: `bankBalanceTin, moneyOnHandTin, dorrinFundsTin, loanAmountTin, taxRateTin, taxNotes, currentGameDate, currentSeason, lastUpdated`
+**GameState** — single row: `currentYear, currentSeason, currentWeek, currentDay`
+**EstateFinances** — single row: `bankBalanceTin, moneyOnHandTin, dorrinFundsTin, loanAmountTin, taxRateTin, taxNotes, lastUpdated`
 **IncomeSources** — `id, name, dailyYieldTin, isActive, notes`
 **Inventory** — `id, name, quantity, unit, category, condition, description, estimatedValue, location, notes`
 **CalendarEvents** — `id, name, description, type, year, season, week, day, displayDate, sortOrder, notes, linkedTaskId`
@@ -211,19 +212,19 @@ dotnet ef database update
 | Families        | `/families`       | ✅ Complete          |
 | Notable Figures | `/notable-figures`| ✅ Complete          |
 | Buildings       | `/buildings`      | ✅ Complete          |
-| Tasks           | `/tasks`          | ⬜ Placeholder       |
-| Inventory       | `/inventory`      | ⬜ Placeholder       |
-| Finances        | `/finances`       | ⬜ Placeholder       |
-| Calendar        | `/calendar`       | ⬜ Placeholder       |
+| Tasks           | `/tasks`          | ✅ Complete          |
+| Inventory       | `/inventory`      | ✅ Complete          |
+| Finances        | `/finances`       | ✅ Complete          |
+| Calendar        | `/calendar`       | ✅ Complete          |
 
 ### Build order (dependencies first)
 1. ~~Families~~ ✅
 2. ~~Notable Figures~~ ✅
 3. ~~Buildings~~ ✅ (cards with linked tasks)
-4. **Tasks** ← next (most complex — links Buildings, Families, Residents)
-5. Inventory (simple table)
-6. Finances (two-section page)
-7. Calendar (most complex — custom date system, links Tasks)
+4. ~~Tasks~~ ✅ (table + kanban, drag-drop, Task↔Calendar integration)
+5. ~~Calendar~~ ✅ (visual grid, recurring events, auto-scroll to today, multi-select season filter, current week highlight)
+6. ~~Inventory~~ ✅ (table, multi-select category filter)
+7. ~~Finances~~ ✅ (snapshot + income sources)
 
 ---
 
@@ -251,6 +252,8 @@ dotnet ef database update
 | GET             | /tasks                    | All tasks                    |
 | POST/PUT/DELETE | /tasks/{id}               | CRUD                         |
 | PATCH           | /tasks/{id}/status        | Quick status update          |
+| GET             | /gamestate                | Current in-world date        |
+| PATCH           | /gamestate                | Update game date             |
 | GET             | /finances                 | Estate finances snapshot     |
 | PUT             | /finances                 | Update finances              |
 | GET/POST/DELETE | /finances/income          | Income sources               |

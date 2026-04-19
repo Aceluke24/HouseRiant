@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Building> Buildings { get; set; }
     public DbSet<EstateTask> Tasks { get; set; }
     public DbSet<EstateFinances> EstateFinances { get; set; }
+    public DbSet<GameState> GameStates { get; set; }
     public DbSet<IncomeSource> IncomeSources { get; set; }
     public DbSet<Inventory> Inventories { get; set; }
     public DbSet<CalendarEvent> CalendarEvents { get; set; }
@@ -144,8 +145,14 @@ public class AppDbContext : DbContext
             e.Property(f => f.LoanAmountTin).HasColumnType("decimal(12,2)");
             e.Property(f => f.TaxRateTin).HasColumnType("decimal(10,2)");
             e.Property(f => f.TaxNotes).IsRequired(false);
-            e.Property(f => f.CurrentGameDate).IsRequired(false);
-            e.Property(f => f.CurrentSeason).IsRequired(false);
+        });
+
+        // GameState — single row holding the current in-world date
+        modelBuilder.Entity<GameState>(e =>
+        {
+            e.HasKey(g => g.Id);
+            e.Property(g => g.CurrentSeason).IsRequired(false);
+            e.Property(g => g.CurrentWeek).IsRequired(false);
         });
 
         // IncomeSource
@@ -233,15 +240,23 @@ public class AppDbContext : DbContext
         // Seed estate finances
         modelBuilder.Entity<EstateFinances>().HasData(new EstateFinances
         {
-            Id = 1,
+            Id             = 1,
             BankBalanceTin = 61,
             MoneyOnHandTin = 0,
             DorrinFundsTin = 0,
-            LoanAmountTin = 57022,
-            TaxRateTin = 0,
-            CurrentSeason = "Malthana's Harvest",
-            CurrentGameDate = "3rd of Brón: Bás",
-            LastUpdated = new DateTime(2026, 3, 22, 0, 0, 0, DateTimeKind.Utc)
+            LoanAmountTin  = 57022,
+            TaxRateTin     = 0,
+            LastUpdated    = new DateTime(2026, 3, 22, 0, 0, 0, DateTimeKind.Utc)
+        });
+
+        // Seed game state
+        modelBuilder.Entity<GameState>().HasData(new GameState
+        {
+            Id            = 1,
+            CurrentYear   = 58,
+            CurrentSeason = "Brón: Bás",
+            CurrentWeek   = null,
+            CurrentDay    = 3,
         });
 
         // Seed income sources

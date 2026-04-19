@@ -17,10 +17,24 @@ public class FinancesController : ControllerBase
     public async Task<ActionResult<EstateFinances>> Get()
     {
         var finances = await _db.EstateFinances.FirstOrDefaultAsync();
-        if (finances is null) return NotFound();
+        if (finances is null)
+        {
+            finances = new EstateFinances
+            {
+                BankBalanceTin  = 0,
+                MoneyOnHandTin  = 0,
+                DorrinFundsTin  = 0,
+                LoanAmountTin   = 0,
+                TaxRateTin      = 0,
+                LastUpdated     = DateTime.UtcNow,
+            };
+            _db.EstateFinances.Add(finances);
+            await _db.SaveChangesAsync();
+        }
         return Ok(finances);
     }
 
+    // Updates financial figures only — does not touch the game date
     [HttpPut]
     public async Task<ActionResult<EstateFinances>> Update([FromBody] UpdateEstateFinancesRequest req)
     {
@@ -29,12 +43,10 @@ public class FinancesController : ControllerBase
         finances.BankBalanceTin = req.BankBalanceTin;
         finances.MoneyOnHandTin = req.MoneyOnHandTin;
         finances.DorrinFundsTin = req.DorrinFundsTin;
-        finances.LoanAmountTin = req.LoanAmountTin;
-        finances.TaxRateTin = req.TaxRateTin;
-        finances.TaxNotes = req.TaxNotes;
-        finances.CurrentGameDate = req.CurrentGameDate;
-        finances.CurrentSeason = req.CurrentSeason;
-        finances.LastUpdated = DateTime.UtcNow;
+        finances.LoanAmountTin  = req.LoanAmountTin;
+        finances.TaxRateTin     = req.TaxRateTin;
+        finances.TaxNotes       = req.TaxNotes;
+        finances.LastUpdated    = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return Ok(finances);
     }
@@ -48,10 +60,10 @@ public class FinancesController : ControllerBase
     {
         var source = new IncomeSource
         {
-            Name = req.Name,
+            Name          = req.Name,
             DailyYieldTin = req.DailyYieldTin,
-            IsActive = req.IsActive,
-            Notes = req.Notes
+            IsActive      = req.IsActive,
+            Notes         = req.Notes
         };
         _db.IncomeSources.Add(source);
         await _db.SaveChangesAsync();
@@ -63,10 +75,10 @@ public class FinancesController : ControllerBase
     {
         var source = await _db.IncomeSources.FindAsync(id);
         if (source is null) return NotFound();
-        source.Name = req.Name;
+        source.Name          = req.Name;
         source.DailyYieldTin = req.DailyYieldTin;
-        source.IsActive = req.IsActive;
-        source.Notes = req.Notes;
+        source.IsActive      = req.IsActive;
+        source.Notes         = req.Notes;
         await _db.SaveChangesAsync();
         return Ok(source);
     }

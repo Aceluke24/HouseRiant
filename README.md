@@ -132,8 +132,13 @@ HouseRiant/
     └── src/
         ├── api/
         │   └── index.ts            ← all API calls in one place
-        ├── components/             ← reusable UI components
-        ├── hooks/                  ← TanStack Query data hooks
+        ├── components/
+        │   ├── CalendarDatePicker.tsx  ← reusable custom calendar date picker
+        │   ├── ConfirmModal.tsx
+        │   ├── calendar/           ← CalendarForm, CalendarDetail
+        │   ├── residents/          ← ResidentForm, ResidentDetail
+        │   └── tasks/              ← TaskForm, TaskDetail, AddToCalendarModal
+        ├── hooks/                  ← TanStack Query data hooks (one file per resource)
         ├── pages/                  ← one file per app page/route
         ├── types/
         │   └── index.ts            ← all TypeScript types and enums
@@ -149,13 +154,49 @@ HouseRiant/
 | Page | Route | Status |
 |------|-------|--------|
 | Residents | `/` | ✅ Complete |
-| Notable Figures | `/notable-figures` |  ✅ Complete  |
-| Families | `/families` | ⬜ Placeholder |
-| Buildings | `/buildings` | ⬜ Placeholder |
-| Tasks | `/tasks` | ⬜ Placeholder |
-| Inventory | `/inventory` | ⬜ Placeholder |
-| Finances | `/finances` | ⬜ Placeholder |
-| Calendar | `/calendar` | ⬜ Placeholder |
+| Focus View | `/focus` | ✅ Complete |
+| Families | `/families` | ✅ Complete |
+| Notable Figures | `/notable-figures` | ✅ Complete |
+| Buildings | `/buildings` | ✅ Complete |
+| Tasks | `/tasks` | ✅ Complete |
+| Calendar | `/calendar` | ✅ Complete |
+| Inventory | `/inventory` | ✅ Complete |
+| Finances | `/finances` | ✅ Complete |
+
+---
+
+## Feature Highlights
+
+### Tasks Page
+- Table view and Kanban board view (drag-and-drop to change status)
+- Search + filter chips for status, priority, and category
+- Slide-in detail panel; full add/edit form with FK dropdowns
+- **"+ Calendar" button** on any task — opens a date picker to add the task to the calendar as a linked event
+- Target Date and Completed Date use the custom `CalendarDatePicker` (structured dropdowns, always correct format)
+
+### Calendar Page
+- Visual grid showing all 4 seasons + 4 Brón transition periods
+- Events displayed as colour-coded chips (Deadline, Battle, Festival, Note, Task, Other)
+- Click any empty cell to add an event pre-filled with that date
+- **Recurring events** — create one event per week across a season (or all seasons); shared `RecurrenceGroupId` lets you delete the entire series at once
+- **"+ Add Task"** button on the Calendar page opens the Task form directly
+- Today indicator with a pinnable current date; year navigation
+- **Auto-scroll to current season** on page load — the view opens directly at today's season
+- **"Jump to Today" button** in the toolbar — scrolls back to the current season from anywhere in the calendar; also switches the year if needed
+- **Current week row highlighted in gold** — within the current season grid, today's week label is gold so it's immediately visible
+- **Multi-select season filter** — season chips now toggle independently; any combination of seasons can be shown simultaneously
+- Linked tasks shown in event detail panel
+
+### Task ↔ Calendar Integration
+- Tasks have a `linkedTaskId` on calendar events — any task can be pinned to a calendar date
+- Events of type **Task** are automatically created when using "Add to Calendar" from TaskDetail
+- The `CalendarDatePicker` component ensures date strings always parse correctly
+
+### Custom Calendar Date Picker (`CalendarDatePicker`)
+- Reusable component used wherever a calendar date must be entered
+- Dropdowns for Year (`Dr-XX`), Season, Week (hidden for Brón seasons), and Day (1–9)
+- "Set date" toggle — shows nothing when empty, full dropdowns when a date is chosen
+- Live preview of the formatted string (e.g. `5th of Iianu of Ambrik's Thaw, Dr-58`)
 
 ---
 
@@ -175,14 +216,16 @@ All endpoints are prefixed with `http://localhost:4000/api/`
 | POST / PUT / DELETE | `/buildings/{id}` | Create, update, or delete a building |
 | GET | `/tasks?search=&status=&category=` | All tasks (filterable) |
 | POST / PUT / DELETE | `/tasks/{id}` | Create, update, or delete a task |
-| PATCH | `/tasks/{id}/status` | Quick status update |
+| PATCH | `/tasks/{id}/status` | Quick status update (used by Kanban drag-and-drop) |
 | GET | `/finances` | Estate finances snapshot |
 | PUT | `/finances` | Update finances |
 | GET / POST / DELETE | `/finances/income` | Manage income sources |
 | GET | `/inventory?search=&category=` | All inventory (filterable) |
 | POST / PUT / DELETE | `/inventory/{id}` | Create, update, or delete an item |
 | GET | `/calendar?year=&season=` | Calendar events |
-| POST / PUT / DELETE | `/calendar/{id}` | Create, update, or delete an event |
+| POST / PUT / DELETE | `/calendar/{id}` | Create, update, or delete a single event |
+| POST | `/calendar/batch` | Batch-create recurring events (assigns shared `RecurrenceGroupId`) |
+| DELETE | `/calendar/group/{groupId}` | Delete all events in a recurring series |
 | POST | `/uploads/portrait` | Upload a portrait image |
 
 ---
@@ -198,7 +241,7 @@ This project uses a fully custom calendar system:
 - **360 days per year**
 - **Year format:** `Dr-58`
 
-Example dates: `5th of Iianu of Ambrik's Thaw` or `3rd of Brón: Bás`
+Example dates: `5th of Iianu of Ambrik's Thaw, Dr-58` or `3rd of Brón: Bás, Dr-58`
 
 ---
 
@@ -236,6 +279,7 @@ Portraits are uploaded via `POST /api/uploads/portrait` (multipart form data) an
 - The `Role` field on Residents is nullable — guard against null before calling string methods.
 - `ReferenceHandler.IgnoreCycles` is configured in `Program.cs` to prevent infinite JSON serialisation loops from circular navigation properties.
 - Portrait blob URLs from `URL.createObjectURL` are temporary and don't persist — always upload through the API endpoint.
+- The `TaskEvent` C# enum value is kept in the backend enum for backward compatibility even though it is displayed as "Task" in the frontend.
 
 ---
 
@@ -256,4 +300,3 @@ dotnet ef database update
 - Raspberry Pi self-hosted deployment
 - Ledger entries table for full financial history
 - Recruitment prospects tracking
-- Image upload support for Notable Figures

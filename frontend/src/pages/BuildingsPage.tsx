@@ -100,6 +100,12 @@ export default function BuildingsPage() {
         />
 
         <div className="filter-chips">
+          <button
+            className={typeFilters.length === 0 ? 'chip chip-active' : 'chip'}
+            onClick={() => setTypeFilters([])}
+          >
+            All
+          </button>
           {BUILDING_TYPES.map(t => (
             <button
               key={t}
@@ -110,11 +116,15 @@ export default function BuildingsPage() {
               {t}
             </button>
           ))}
-        </div>
 
-        <span style={{ alignSelf: 'center', color: 'var(--border-mid)', fontSize: '1.1rem', margin: '0 0.25rem', userSelect: 'none' }}>|</span>
+          <span className="filter-sep">|</span>
 
-        <div className="filter-chips">
+          <button
+            className={conditionFilters.length === 0 ? 'chip chip-active' : 'chip'}
+            onClick={() => setConditionFilters([])}
+          >
+            All
+          </button>
           {BUILDING_CONDITIONS.map(c => (
             <button
               key={c}

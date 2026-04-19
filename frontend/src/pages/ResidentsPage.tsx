@@ -212,24 +212,24 @@ export default function ResidentsPage() {
               {STATUS_LABELS[f] ?? f}
             </button>
           ))}
+          {residentGroups.length > 0 && (
+            <>
+              <span className="filter-sep">|</span>
+              {residentGroups.map(g => (
+                <button
+                  key={g.id}
+                  className={`chip ${activeGroupId === g.id ? 'chip-active' : ''}`}
+                  style={activeGroupId === g.id ? { borderColor: g.color ?? undefined, color: g.color ?? undefined } : {}}
+                  onClick={() => setActiveGroupId(prev => prev === g.id ? null : g.id)}
+                >
+                  <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: g.color ?? 'var(--ink-muted)', marginRight: 5, verticalAlign: 'middle' }} />
+                  {g.name}
+                </button>
+              ))}
+            </>
+          )}
         </div>
-        {residentGroups.length > 0 && (
-          <div className="filter-chips" style={{ marginTop: 6 }}>
-            <span style={{ fontSize: 11, color: 'var(--ink-muted)', alignSelf: 'center', marginRight: 4, fontFamily: 'var(--font-heading)' }}>GROUPS</span>
-            {residentGroups.map(g => (
-              <button
-                key={g.id}
-                className={`chip ${activeGroupId === g.id ? 'chip-active' : ''}`}
-                style={activeGroupId === g.id ? { borderColor: g.color ?? undefined, color: g.color ?? undefined } : {}}
-                onClick={() => setActiveGroupId(prev => prev === g.id ? null : g.id)}
-              >
-                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: g.color ?? 'var(--ink-muted)', marginRight: 5, verticalAlign: 'middle' }} />
-                {g.name}
-              </button>
-            ))}
-          </div>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: residentGroups.length > 0 ? 6 : 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <select
             className="form-select"
             style={{ fontSize: 12, padding: '4px 8px', height: 30 }}

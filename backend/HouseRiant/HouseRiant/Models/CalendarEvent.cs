@@ -38,4 +38,7 @@ public class CalendarEvent
 
     public int? LinkedTaskId { get; set; }
     public EstateTask? LinkedTask { get; set; }
+
+    // Recurring events: all instances of a series share the same RecurrenceGroupId
+    public int? RecurrenceGroupId { get; set; }
 }

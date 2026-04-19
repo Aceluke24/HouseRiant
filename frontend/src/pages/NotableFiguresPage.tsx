@@ -49,7 +49,7 @@ function sortFigures(figures: NotableFigure[], sortBy: SortField): NotableFigure
 export default function NotableFiguresPage() {
   const [search, setSearch] = useState('')
   const [relFilters, setRelFilters] = useState<string[]>([])
-  const [aliveFilter, setAliveFilter] = useState<'all' | 'alive' | 'deceased'>('all')
+  const [aliveFilters, setAliveFilters] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<SortField>('custom')
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
   const [view, setView] = useState<'table' | 'grid'>('table')
@@ -76,11 +76,13 @@ export default function NotableFiguresPage() {
   const filteredFigures = useMemo(() => {
     let result = figures
     if (relFilters.length > 0) result = result.filter(f => f.relationship != null && relFilters.includes(f.relationship))
-    if (aliveFilter === 'alive') result = result.filter(f => f.isAlive)
-    if (aliveFilter === 'deceased') result = result.filter(f => !f.isAlive)
+    if (aliveFilters.length === 1) {
+      if (aliveFilters[0] === 'alive') result = result.filter(f => f.isAlive)
+      else result = result.filter(f => !f.isAlive)
+    }
     if (groupMemberIds != null) result = result.filter(f => groupMemberIds.has(f.id))
     return result
-  }, [figures, relFilters, aliveFilter, groupMemberIds])
+  }, [figures, relFilters, aliveFilters, groupMemberIds])
 
   // Derive selected from live data so the detail panel auto-updates after mutations
   const selected = selectedId != null ? (figures.find(f => f.id === selectedId) ?? null) : null
@@ -118,7 +120,7 @@ export default function NotableFiguresPage() {
   const handleFormClose = () => { setShowForm(false); setEditTarget(undefined) }
 
   // ── Drag-to-reorder ──────────────────────────────────────────────────────────
-  const isDraggable = sortBy === 'custom' && !search && relFilters.length === 0 && aliveFilter === 'all' && activeGroupId == null
+  const isDraggable = sortBy === 'custom' && !search && relFilters.length === 0 && aliveFilters.length === 0 && activeGroupId == null
 
   const handleDragStart = (e: React.DragEvent, id: number) => {
     if (!isDraggable) { e.preventDefault(); return }
@@ -188,33 +190,46 @@ export default function NotableFiguresPage() {
               {r}
             </button>
           ))}
-          <div style={{ width: 1, background: 'var(--border)', margin: '0 4px', alignSelf: 'stretch' }} />
-          <button className={`chip ${aliveFilter === 'alive' ? 'chip-active' : ''}`}
-            onClick={() => setAliveFilter(prev => prev === 'alive' ? 'all' : 'alive')}>
+
+          <span className="filter-sep">|</span>
+
+          <button
+            className={`chip ${aliveFilters.length === 0 ? 'chip-active' : ''}`}
+            onClick={() => setAliveFilters([])}
+          >
+            All
+          </button>
+          <button
+            className={`chip ${aliveFilters.includes('alive') ? 'chip-active' : ''}`}
+            onClick={() => setAliveFilters(prev => prev.includes('alive') ? prev.filter(x => x !== 'alive') : [...prev, 'alive'])}
+          >
             Alive
           </button>
-          <button className={`chip ${aliveFilter === 'deceased' ? 'chip-active' : ''}`}
-            onClick={() => setAliveFilter(prev => prev === 'deceased' ? 'all' : 'deceased')}>
+          <button
+            className={`chip ${aliveFilters.includes('deceased') ? 'chip-active' : ''}`}
+            onClick={() => setAliveFilters(prev => prev.includes('deceased') ? prev.filter(x => x !== 'deceased') : [...prev, 'deceased'])}
+          >
             Deceased
           </button>
+
+          {groups.length > 0 && (
+            <>
+              <span className="filter-sep">|</span>
+              {groups.map(g => (
+                <button
+                  key={g.id}
+                  className={`chip ${activeGroupId === g.id ? 'chip-active' : ''}`}
+                  style={activeGroupId === g.id ? { borderColor: g.color ?? undefined, color: g.color ?? undefined } : {}}
+                  onClick={() => setActiveGroupId(prev => prev === g.id ? null : g.id)}
+                >
+                  <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: g.color ?? 'var(--ink-muted)', marginRight: 5, verticalAlign: 'middle' }} />
+                  {g.name}
+                </button>
+              ))}
+            </>
+          )}
         </div>
-        {groups.length > 0 && (
-          <div className="filter-chips" style={{ marginTop: 6 }}>
-            <span style={{ fontSize: 11, color: 'var(--ink-muted)', alignSelf: 'center', marginRight: 4, fontFamily: 'var(--font-heading)' }}>GROUPS</span>
-            {groups.map(g => (
-              <button
-                key={g.id}
-                className={`chip ${activeGroupId === g.id ? 'chip-active' : ''}`}
-                style={activeGroupId === g.id ? { borderColor: g.color ?? undefined, color: g.color ?? undefined } : {}}
-                onClick={() => setActiveGroupId(prev => prev === g.id ? null : g.id)}
-              >
-                <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: g.color ?? 'var(--ink-muted)', marginRight: 5, verticalAlign: 'middle' }} />
-                {g.name}
-              </button>
-            ))}
-          </div>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: groups.length > 0 ? 6 : 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <select
             className="form-select"
             style={{ fontSize: 12, padding: '4px 8px', height: 30 }}

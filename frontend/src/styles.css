@@ -148,7 +148,16 @@ body {
   box-shadow: 0 0 0 3px rgba(26,63,122,0.08);
 }
 
-.filter-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.filter-chips { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+
+.filter-sep {
+  color: var(--ink-muted);
+  font-size: 13px;
+  align-self: center;
+  padding: 0 4px;
+  user-select: none;
+  opacity: 0.45;
+}
 
 .chip {
   font-family: 'Cinzel', serif;
@@ -638,10 +647,105 @@ textarea { resize: vertical; min-height: 70px; }
 .amount-positive { color: var(--success); font-weight: 500; }
 .amount-negative { color: var(--danger); font-weight: 500; }
 
+/* ── Task Status badges ─────────────────────────────────── */
+.badge-planned    { background: var(--blue-pale);    color: var(--blue-royal); border: 1px solid var(--border-mid); }
+.badge-inprogress { background: var(--gold-pale);    color: #6b5000;           border: 1px solid var(--border-gold); }
+.badge-completed  { background: var(--success-bg);   color: var(--success);    border: 1px solid rgba(26,92,42,0.25); }
+.badge-blocked    { background: var(--danger-bg);    color: var(--danger);     border: 1px solid rgba(139,26,26,0.25); }
+
+/* ── Task Priority badges ───────────────────────────────── */
+.badge-low    { background: var(--parchment2); color: var(--ink-muted);  border: 1px solid var(--border); }
+.badge-medium { background: var(--blue-pale);  color: var(--blue-royal); border: 1px solid var(--border-mid); }
+.badge-high   { background: var(--gold-pale);  color: #6b5000;           border: 1px solid var(--border-gold); }
+.badge-urgent { background: var(--danger-bg);  color: var(--danger);     border: 1px solid rgba(139,26,26,0.25); }
+
+/* Inventory condition badges */
+.badge-poor      { background: var(--danger-bg);    color: var(--danger);     border: 1px solid rgba(139,26,26,0.25); }
+.badge-fair      { background: var(--gold-pale);     color: #6b5000;           border: 1px solid var(--border-gold); }
+.badge-good      { background: var(--success-bg);    color: var(--success);    border: 1px solid rgba(26,92,42,0.25); }
+.badge-excellent { background: var(--blue-pale);     color: var(--blue-royal); border: 1px solid var(--border-mid); }
+
+/* ── Kanban board ───────────────────────────────────────── */
+.kanban-board {
+  display: flex; gap: 0.85rem;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  flex: 1;
+}
+
+.kanban-col {
+  flex: 1; min-width: 210px; max-width: 300px;
+  background: var(--parchment2);
+  border-radius: var(--radius-lg);
+  padding: 0.7rem;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, background 0.15s;
+}
+.kanban-col-over {
+  border-color: var(--blue-mid);
+  background: var(--blue-ghost);
+}
+
+.kanban-col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'Cinzel', serif; font-size: 10px;
+  color: var(--ink-muted); letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-mid);
+}
+.kanban-col-count {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1px 7px;
+  font-size: 10px; color: var(--ink-muted);
+}
+
+.kanban-cards {
+  display: flex; flex-direction: column; gap: 0.45rem;
+  min-height: 60px;
+}
+
+.kanban-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.kanban-card:hover {
+  border-color: var(--blue-mid);
+  box-shadow: 0 2px 8px rgba(26,63,122,0.1);
+}
+.kanban-card.selected {
+  border-color: var(--blue-royal);
+  background: var(--blue-ghost);
+}
+.kanban-card-title {
+  font-family: 'Cinzel', serif; font-size: 12px;
+  color: var(--ink); font-weight: 500;
+  margin-bottom: 5px; line-height: 1.4;
+}
+.kanban-card-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
+.kanban-card-meta {
+  font-size: 12px; color: var(--ink-muted);
+  display: flex; flex-direction: column; gap: 2px;
+  margin-top: 5px;
+}
+.kanban-card-actions {
+  display: flex; gap: 4px;
+  margin-top: 6px; padding-top: 5px;
+  border-top: 1px solid var(--border);
+}
+
 /* ── Calendar ──────────────────────────────────────────── */
 
-/* Battle badge (not in core set) */
+/* Battle / Task badges (not in core set) */
 .badge-battle { background: rgba(192,64,32,0.1); color: #c04020; border: 1px solid rgba(192,64,32,0.3); }
+.badge-task   { background: rgba(80,50,160,0.1); color: #5032a0; border: 1px solid rgba(80,50,160,0.3); }
 
 /* Year navigation */
 .cal-year-nav { display: flex; align-items: center; gap: 4px; }
@@ -740,6 +844,22 @@ textarea { resize: vertical; min-height: 70px; }
 .cal-cell-today:hover { background: var(--gold-pale) !important; }
 
 /* Today display in toolbar */
+/* Current week row highlight */
+.cal-week-label-current {
+  background: var(--gold) !important;
+  color: var(--ink) !important;
+  font-weight: 600;
+}
+
+/* Jump to Today button */
+.cal-jump-today-btn {
+  font-size: 11px;
+  color: var(--gold);
+  text-decoration: underline;
+  padding: 0 2px;
+}
+.cal-jump-today-btn:hover { color: var(--gold-light); }
+
 .cal-today-display {
   display: flex; align-items: center; gap: 6px;
   background: var(--gold-ghost);

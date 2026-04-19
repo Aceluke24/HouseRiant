@@ -11,6 +11,9 @@ import NotableFiguresPage from './pages/NotableFiguresPage'
 import GroupsPage from './pages/GroupsPage'
 import CalendarPage from './pages/CalendarPage'
 import BuildingsPage from './pages/BuildingsPage'
+import TasksPage from './pages/TasksPage'
+import InventoryPage from './pages/InventoryPage'
+import FinancesPage from './pages/FinancesPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,9 +74,9 @@ export default function App() {
                 <Route path="/families" element={<FamiliesPage />} />
                 <Route path="/groups" element={<GroupsPage />} />
                 <Route path="/buildings" element={<BuildingsPage />} />
-                <Route path="/tasks" element={<Placeholder title="Tasks" />} />
-                <Route path="/inventory" element={<Placeholder title="Inventory" />} />
-                <Route path="/finances" element={<Placeholder title="Finances" />} />
+                <Route path="/tasks" element={<TasksPage />} />
+                <Route path="/inventory" element={<InventoryPage />} />
+                <Route path="/finances" element={<FinancesPage />} />
                 <Route path="/calendar" element={<CalendarPage />} />
               </Routes>
             </main>

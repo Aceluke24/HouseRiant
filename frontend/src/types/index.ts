@@ -7,9 +7,9 @@ export type BuildingCondition = 'Ruined' | 'Poor' | 'Functional' | 'Good' | 'Exc
 export type EstateTaskStatus = 'Planned' | 'InProgress' | 'Completed' | 'Blocked'
 export type TaskPriority = 'Low' | 'Medium' | 'High' | 'Urgent'
 export type TaskCategory = 'Construction' | 'Recruitment' | 'Procurement' | 'Military' | 'Financial' | 'Agricultural' | 'Diplomatic' | 'Other'
-export type InventoryCategory = 'Animals' | 'Weapons' | 'Tools' | 'Materials' | 'Food' | 'Documents' | 'Clothing' | 'Other'
+export type InventoryCategory = 'Animals' | 'Weapons' | 'Tools' | 'Materials' | 'Food' | 'Documents' | 'Clothing' | 'Other' | 'Armor' | 'Medicine' | 'MagicItems' | 'Valuables' | 'Equipment'
 export type InventoryCondition = 'Poor' | 'Fair' | 'Good' | 'Excellent'
-export type CalendarEventType = 'Deadline' | 'Battle' | 'Festival' | 'TaskEvent' | 'Note' | 'Other'
+export type CalendarEventType = 'Deadline' | 'Battle' | 'Festival' | 'Note' | 'TaskEvent' | 'Other'
 export type FamilyRelationship = 'Ally' | 'Friend' | 'Neutral' | 'Foe' | 'Vassal' | 'Rival' | 'Unknown'
 
 
@@ -264,6 +264,23 @@ export interface CreateTaskRequest {
   assignedResidentId?: number
 }
 
+// ── Game State ────────────────────────────────────────────
+
+export interface GameState {
+  id: number
+  currentYear: number
+  currentSeason?: string
+  currentWeek?: string   // null for Brón transition seasons
+  currentDay: number
+}
+
+export interface UpdateGameDateRequest {
+  currentYear: number
+  currentSeason: string
+  currentWeek?: string
+  currentDay: number
+}
+
 // ── Estate Finances ───────────────────────────────────────
 
 export interface EstateFinances {
@@ -274,8 +291,6 @@ export interface EstateFinances {
   loanAmountTin: number
   taxRateTin: number
   taxNotes?: string
-  currentGameDate?: string
-  currentSeason?: string
   lastUpdated: string
 }
 
@@ -355,6 +370,7 @@ export interface CalendarEvent {
   sortOrder: number
   notes?: string
   linkedTaskId?: number
+  recurrenceGroupId?: number  // set on recurring events — all instances share the same group id
   shortLabel?: string   // custom short text shown in the grid (falls back to name)
   endWeek?: string      // end week for multi-day events (null = same week as start)
   endDay?: number       // end day 1-9 (null = same day as start)

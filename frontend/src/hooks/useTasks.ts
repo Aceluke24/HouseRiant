@@ -35,3 +35,12 @@ export function useDeleteTask() {
     onSuccess: () => qc.invalidateQueries({ queryKey: [TASKS_KEY] }),
   })
 }
+
+export function useUpdateTaskStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      tasksApi.updateStatus(id, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [TASKS_KEY] }),
+  })
+}

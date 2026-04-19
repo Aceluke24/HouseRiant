@@ -1,13 +1,15 @@
-import { Fragment, useState } from 'react'
+import { Fragment, forwardRef, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useCalendar, useDeleteCalendarEvent } from '../hooks/useCalendar'
+import { useCalendar, useDeleteCalendarEvent, useDeleteCalendarEventGroup } from '../hooks/useCalendar'
+import { useGameState, useUpdateGameDate } from '../hooks/useGameState'
 import CalendarForm from '../components/calendar/CalendarForm'
 import CalendarDetail from '../components/calendar/CalendarDetail'
+import TaskForm from '../components/tasks/TaskForm'
 import ConfirmModal from '../components/ConfirmModal'
 import type { CalendarEvent, CalendarEventType } from '../types'
 import { SEASONS, WEEKS } from '../types'
 
-// ── Today state (persisted to localStorage) ────────────────────────────────
+// ── Today date shape ───────────────────────────────────────────────────────
 
 interface TodayDate {
   year: number
@@ -16,21 +18,7 @@ interface TodayDate {
   day: number
 }
 
-const TODAY_KEY = 'hr-today'
 const DEFAULT_TODAY: TodayDate = { year: 58, season: "Brón: Bás", week: undefined, day: 3 }
-
-function loadToday(): TodayDate {
-  try {
-    const raw = localStorage.getItem(TODAY_KEY)
-    return raw ? { ...DEFAULT_TODAY, ...JSON.parse(raw) } : DEFAULT_TODAY
-  } catch {
-    return DEFAULT_TODAY
-  }
-}
-
-function saveToday(t: TodayDate) {
-  localStorage.setItem(TODAY_KEY, JSON.stringify(t))
-}
 
 function ordinal(n: number): string {
   if (n === 1) return '1st'
@@ -46,12 +34,12 @@ function formatToday(t: TodayDate): string {
 
 // ── Misc helpers ───────────────────────────────────────────────────────────
 
-const TYPE_CHIP: Record<CalendarEventType, string> = {
+const TYPE_CHIP: { [key: string]: string } = {
   Deadline:  'cal-chip cal-chip-deadline',
   Battle:    'cal-chip cal-chip-battle',
   Festival:  'cal-chip cal-chip-festival',
-  TaskEvent: 'cal-chip cal-chip-task',
   Note:      'cal-chip cal-chip-note',
+  TaskEvent: 'cal-chip cal-chip-task',
   Other:     'cal-chip cal-chip-other',
 }
 
@@ -214,11 +202,16 @@ function CalendarCell({ day, week, events, isToday, onSelect, onAdd, onSetToday 
           return (
             <div
               key={ev.id}
-              className={`${TYPE_CHIP[ev.type]} ${shape}`}
+              className={`${TYPE_CHIP[ev.type] ?? 'cal-chip cal-chip-other'} ${shape}`}
               title={ev.name}
               onClick={e => { e.stopPropagation(); onSelect(ev) }}
             >
-              {(start || solo) && <span className="cal-chip-label">{label}</span>}
+              {(start || solo) && (
+                <span className="cal-chip-label">
+                  {ev.recurrenceGroupId != null && <span style={{ marginRight: 2, opacity: 0.8 }}>↻</span>}
+                  {label}
+                </span>
+              )}
             </div>
           )
         })}
@@ -239,7 +232,7 @@ interface SeasonGridProps {
   onSetToday: (t: TodayDate) => void
 }
 
-function SeasonGrid({ season, events, year, today, onSelect, onAdd, onSetToday }: SeasonGridProps) {
+const SeasonGrid = forwardRef<HTMLDivElement, SeasonGridProps>(function SeasonGrid({ season, events, year, today, onSelect, onAdd, onSetToday }, ref) {
   const bron = isBron(season)
   const isCurrentSeason = year === today.year && season === today.season
 
@@ -258,7 +251,7 @@ function SeasonGrid({ season, events, year, today, onSelect, onAdd, onSetToday }
   }
 
   return (
-    <div className="cal-season-block">
+    <div className="cal-season-block" ref={ref}>
       <div className={`cal-season-heading${isCurrentSeason ? ' cal-season-heading-current' : ''}`}>
         {season}
         {bron && <span className="cal-season-tag">transition</span>}
@@ -288,9 +281,11 @@ function SeasonGrid({ season, events, year, today, onSelect, onAdd, onSetToday }
             ))}
           </>
         ) : (
-          WEEKS.map(week => (
+          WEEKS.map(week => {
+            const isCurrentWeek = isCurrentSeason && week === today.week
+            return (
             <Fragment key={week}>
-              <div className="cal-week-label">{week}</div>
+              <div className={`cal-week-label${isCurrentWeek ? ' cal-week-label-current' : ''}`}>{week}</div>
               {DAYS.map(d => (
                 <CalendarCell
                   key={`${week}-${d}`}
@@ -304,38 +299,92 @@ function SeasonGrid({ season, events, year, today, onSelect, onAdd, onSetToday }
                 />
               ))}
             </Fragment>
-          ))
+            )
+          })
         )}
       </div>
     </div>
   )
-}
+})
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
 export default function CalendarPage() {
   const { data: allEvents = [], isLoading } = useCalendar()
+  const { data: gameState } = useGameState()
+  const updateGameDate = useUpdateGameDate()
   const deleteEvent = useDeleteCalendarEvent()
+  const deleteGroup = useDeleteCalendarEventGroup()
 
-  const [today, setTodayState] = useState<TodayDate>(loadToday)
+  // Derive today from the DB-backed game state record
+  const today: TodayDate = gameState
+    ? { year: gameState.currentYear, season: gameState.currentSeason ?? DEFAULT_TODAY.season, week: gameState.currentWeek ?? undefined, day: gameState.currentDay }
+    : DEFAULT_TODAY
+
   const [showTodayEditor, setShowTodayEditor] = useState(false)
-  const [year, setYear] = useState(() => loadToday().year)
-  const [seasonFilter, setSeasonFilter] = useState<string | null>(null)
-  const [selected, setSelected] = useState<CalendarEvent | null>(null)
+  const [year, setYear] = useState(DEFAULT_TODAY.year)
+  const [seasonFilter, setSeasonFilter] = useState<Set<string>>(new Set())
+
+  // Once game state loads for the first time, jump the view to today's year and scroll to today's season
+  const initializedRef = useRef(false)
+  const currentSeasonRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (gameState && !initializedRef.current) {
+      setYear(gameState.currentYear)
+      if (gameState.currentSeason) setSeasonFilter(new Set([gameState.currentSeason]))
+      initializedRef.current = true
+      // Scroll after the season grids have rendered
+      requestAnimationFrame(() => {
+        currentSeasonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+  }, [gameState])
+
+  const pendingJumpRef = useRef(false)
+
+  // When a cross-year jump completes, scroll to the current season
+  useEffect(() => {
+    if (pendingJumpRef.current) {
+      pendingJumpRef.current = false
+      requestAnimationFrame(() => {
+        currentSeasonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+  }, [year])
+
+  function jumpToToday() {
+    if (year !== today.year) {
+      pendingJumpRef.current = true
+      setYear(today.year)
+    } else {
+      currentSeasonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<CalendarEvent | undefined>()
   const [prefill, setPrefill] = useState<{ season?: string; week?: string; day?: number; year?: number } | undefined>()
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+  const [confirmDeleteGroupId, setConfirmDeleteGroupId] = useState<number | null>(null)
+  const [showTaskForm, setShowTaskForm] = useState(false)
 
   function handleSetToday(t: TodayDate) {
-    saveToday(t)
-    setTodayState(t)
-    setYear(t.year)          // jump calendar view to the new year
+    updateGameDate.mutate({
+      currentYear:   t.year,
+      currentSeason: t.season,
+      currentWeek:   t.week,
+      currentDay:    t.day,
+    })
+    setYear(t.year)   // jump calendar view to the new year immediately
     setShowTodayEditor(false)
   }
 
   const yearEvents = allEvents.filter(e => e.year === year)
-  const visibleSeasons = seasonFilter ? SEASONS.filter(s => s === seasonFilter) : SEASONS
+  const visibleSeasons = seasonFilter.size > 0 ? SEASONS.filter(s => seasonFilter.has(s)) : SEASONS
+
+  // Derive selected from live data so edits are reflected immediately
+  const selected = selectedId != null ? allEvents.find(e => e.id === selectedId) ?? null : null
 
   function handleAdd(pre?: { season?: string; week?: string; day?: number; year?: number }) {
     setEditTarget(undefined)
@@ -358,15 +407,25 @@ export default function CalendarPage() {
   async function handleConfirmDelete() {
     if (confirmDeleteId == null) return
     await deleteEvent.mutateAsync(confirmDeleteId)
-    if (selected?.id === confirmDeleteId) setSelected(null)
+    if (selectedId === confirmDeleteId) setSelectedId(null)
     setConfirmDeleteId(null)
+  }
+
+  async function handleConfirmDeleteGroup() {
+    if (confirmDeleteGroupId == null) return
+    await deleteGroup.mutateAsync(confirmDeleteGroupId)
+    if (selected?.recurrenceGroupId === confirmDeleteGroupId) setSelectedId(null)
+    setConfirmDeleteGroupId(null)
   }
 
   return (
     <div className="page">
       <div className="page-header">
         <h1>Calendar</h1>
-        <button className="btn-primary" onClick={() => handleAdd()}>+ Add Event</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn-secondary" onClick={() => setShowTaskForm(true)}>+ Add Task</button>
+          <button className="btn-primary" onClick={() => handleAdd()}>+ Add Event</button>
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -389,32 +448,33 @@ export default function CalendarPage() {
             >
               ✏
             </button>
-            {year !== today.year && (
-              <button
-                className="btn-ghost"
-                style={{ fontSize: 11, color: 'var(--gold)', textDecoration: 'underline' }}
-                onClick={() => setYear(today.year)}
-                title={`Jump to Dr-${today.year}`}
-              >
-                Go to Dr-{today.year}
-              </button>
-            )}
+            <button
+              className="btn-ghost cal-jump-today-btn"
+              onClick={jumpToToday}
+              title="Scroll to current season"
+            >
+              Jump to Today
+            </button>
           </div>
         </div>
 
         {/* Row 2: season filter chips */}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           <button
-            className={`chip${seasonFilter === null ? ' chip-active' : ''}`}
-            onClick={() => setSeasonFilter(null)}
+            className={`chip${seasonFilter.size === 0 ? ' chip-active' : ''}`}
+            onClick={() => setSeasonFilter(new Set())}
           >
             All
           </button>
           {SEASONS.map(s => (
             <button
               key={s}
-              className={`chip${seasonFilter === s ? ' chip-active' : ''}${isBron(s) ? ' chip-bron' : ''}`}
-              onClick={() => setSeasonFilter(prev => prev === s ? null : s)}
+              className={`chip${seasonFilter.has(s) ? ' chip-active' : ''}${isBron(s) ? ' chip-bron' : ''}`}
+              onClick={() => setSeasonFilter(prev => {
+                const next = new Set(prev)
+                next.has(s) ? next.delete(s) : next.add(s)
+                return next
+              })}
             >
               {s}
             </button>
@@ -427,18 +487,22 @@ export default function CalendarPage() {
       ) : (
         <div className="list-layout" style={{ alignItems: 'flex-start' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            {visibleSeasons.map(season => (
-              <SeasonGrid
-                key={season}
-                season={season}
-                events={yearEvents}
-                year={year}
-                today={today}
-                onSelect={e => setSelected(e)}
-                onAdd={pre => handleAdd(pre)}
-                onSetToday={handleSetToday}
-              />
-            ))}
+            {visibleSeasons.map(season => {
+              const isCurrentSeason = year === today.year && season === today.season
+              return (
+                <SeasonGrid
+                  key={season}
+                  ref={isCurrentSeason ? currentSeasonRef : undefined}
+                  season={season}
+                  events={yearEvents}
+                  year={year}
+                  today={today}
+                  onSelect={e => setSelectedId(e.id)}
+                  onAdd={pre => handleAdd(pre)}
+                  onSetToday={handleSetToday}
+                />
+              )
+            })}
 
             {yearEvents.length === 0 && !isLoading && (
               <p style={{ color: 'var(--ink-muted)', fontStyle: 'italic', marginTop: '2rem' }}>
@@ -452,7 +516,10 @@ export default function CalendarPage() {
               event={selected}
               onEdit={() => handleEdit(selected)}
               onDelete={() => setConfirmDeleteId(selected.id)}
-              onClose={() => setSelected(null)}
+              onDeleteGroup={selected.recurrenceGroupId != null
+                ? () => setConfirmDeleteGroupId(selected.recurrenceGroupId!)
+                : undefined}
+              onClose={() => setSelectedId(null)}
             />
           )}
         </div>
@@ -483,6 +550,18 @@ export default function CalendarPage() {
           onCancel={() => setConfirmDeleteId(null)}
         />
       )}
+
+      {confirmDeleteGroupId != null && (
+        <ConfirmModal
+          title="Delete Entire Series"
+          message="This will delete all recurring events in this series. This cannot be undone."
+          confirmLabel="Delete Series"
+          onConfirm={handleConfirmDeleteGroup}
+          onCancel={() => setConfirmDeleteGroupId(null)}
+        />
+      )}
+
+      {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} />}
     </div>
   )
 }

@@ -4,19 +4,24 @@ interface Props {
   event: CalendarEvent
   onEdit: () => void
   onDelete: () => void
+  onDeleteGroup?: () => void
   onClose: () => void
 }
 
-const TYPE_BADGE: Record<CalendarEventType, string> = {
+const TYPE_BADGE: { [key: string]: string } = {
   Deadline:  'badge badge-danger',
   Battle:    'badge badge-battle',
   Festival:  'badge badge-warning',
-  TaskEvent: 'badge badge-success',
   Note:      'badge badge-info',
+  TaskEvent: 'badge badge-task',
   Other:     'badge badge-other',
 }
 
-export default function CalendarDetail({ event: e, onEdit, onDelete, onClose }: Props) {
+const TYPE_LABELS: { [key: string]: string } = {
+  TaskEvent: 'Task',
+}
+
+export default function CalendarDetail({ event: e, onEdit, onDelete, onDeleteGroup, onClose }: Props) {
   return (
     <div className="detail-panel">
       <div className="detail-header">
@@ -30,7 +35,7 @@ export default function CalendarDetail({ event: e, onEdit, onDelete, onClose }: 
       <div className="detail-body">
         <div className="detail-row">
           <span className="detail-label">Type</span>
-          <span className={TYPE_BADGE[e.type]}>{e.type}</span>
+          <span className={TYPE_BADGE[e.type] ?? 'badge badge-other'}>{TYPE_LABELS[e.type] ?? e.type}</span>
         </div>
         <div className="detail-row">
           <span className="detail-label">Year</span>
@@ -66,6 +71,14 @@ export default function CalendarDetail({ event: e, onEdit, onDelete, onClose }: 
             <span className="detail-value" style={{ color: 'var(--blue-mid)' }}>#{e.linkedTaskId}</span>
           </div>
         )}
+        {e.recurrenceGroupId != null && (
+          <div className="detail-row">
+            <span className="detail-label">Recurring</span>
+            <span className="detail-value" style={{ color: 'var(--ink-muted)', fontSize: 12 }}>
+              ↻ Series #{e.recurrenceGroupId}
+            </span>
+          </div>
+        )}
       </div>
 
       {e.description && (
@@ -83,6 +96,11 @@ export default function CalendarDetail({ event: e, onEdit, onDelete, onClose }: 
 
       <div className="detail-footer">
         <button className="btn-secondary" onClick={onEdit}>Edit</button>
+        {e.recurrenceGroupId != null && onDeleteGroup && (
+          <button className="btn-secondary" onClick={onDeleteGroup} title="Delete all events in this series">
+            Delete Series
+          </button>
+        )}
         <button className="btn-danger" onClick={onDelete}>Delete</button>
       </div>
     </div>

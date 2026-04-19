@@ -3,6 +3,7 @@ using System;
 using HouseRhiant.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HouseRiant.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260418044508_AddRecurrenceGroupId")]
+    partial class AddRecurrenceGroupId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,6 +176,12 @@ namespace HouseRiant.Migrations
                     b.Property<decimal>("BankBalanceTin")
                         .HasColumnType("decimal(12,2)");
 
+                    b.Property<string>("CurrentGameDate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CurrentSeason")
+                        .HasColumnType("text");
+
                     b.Property<decimal>("DorrinFundsTin")
                         .HasColumnType("decimal(12,2)");
 
@@ -200,6 +209,8 @@ namespace HouseRiant.Migrations
                         {
                             Id = 1,
                             BankBalanceTin = 61m,
+                            CurrentGameDate = "3rd of Brón: Bás",
+                            CurrentSeason = "Malthana's Harvest",
                             DorrinFundsTin = 0m,
                             LastUpdated = new DateTime(2026, 3, 22, 0, 0, 0, 0, DateTimeKind.Utc),
                             LoanAmountTin = 57022m,
@@ -317,40 +328,6 @@ namespace HouseRiant.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Families");
-                });
-
-            modelBuilder.Entity("HouseRhiant.Api.Models.GameState", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CurrentDay")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CurrentSeason")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentWeek")
-                        .HasColumnType("text");
-
-                    b.Property<int>("CurrentYear")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GameStates");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CurrentDay = 3,
-                            CurrentSeason = "Brón: Bás",
-                            CurrentYear = 58
-                        });
                 });
 
             modelBuilder.Entity("HouseRhiant.Api.Models.IncomeSource", b =>

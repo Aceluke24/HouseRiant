@@ -68,4 +68,47 @@ public class CalendarController : ControllerBase
         await _db.SaveChangesAsync();
         return NoContent();
     }
+
+    [HttpPost("batch")]
+    public async Task<ActionResult<IEnumerable<CalendarEvent>>> BatchCreate(
+        [FromBody] BatchCreateCalendarEventsRequest req)
+    {
+        if (req.Events == null || req.Events.Count == 0)
+            return BadRequest("No events provided.");
+
+        int? maxGroup = await _db.CalendarEvents
+            .Where(c => c.RecurrenceGroupId != null)
+            .MaxAsync(c => (int?)c.RecurrenceGroupId);
+        int groupId = (maxGroup ?? 0) + 1;
+
+        var created = new List<CalendarEvent>();
+        foreach (var r in req.Events)
+        {
+            var ev = new CalendarEvent
+            {
+                Name = r.Name, Description = r.Description, Type = r.Type,
+                Year = r.Year, Season = r.Season, Week = r.Week, Day = r.Day,
+                DisplayDate = r.DisplayDate, SortOrder = r.SortOrder,
+                Notes = r.Notes, LinkedTaskId = r.LinkedTaskId,
+                ShortLabel = r.ShortLabel, EndWeek = r.EndWeek, EndDay = r.EndDay,
+                RecurrenceGroupId = groupId
+            };
+            _db.CalendarEvents.Add(ev);
+            created.Add(ev);
+        }
+        await _db.SaveChangesAsync();
+        return Ok(created);
+    }
+
+    [HttpDelete("group/{groupId:int}")]
+    public async Task<IActionResult> DeleteGroup(int groupId)
+    {
+        var events = await _db.CalendarEvents
+            .Where(c => c.RecurrenceGroupId == groupId)
+            .ToListAsync();
+        if (events.Count == 0) return NotFound();
+        _db.CalendarEvents.RemoveRange(events);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
 }

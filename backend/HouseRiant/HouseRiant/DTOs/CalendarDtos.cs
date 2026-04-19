@@ -18,3 +18,5 @@ public record CreateCalendarEventRequest(
     string? EndWeek,
     int? EndDay
 );
+
+public record BatchCreateCalendarEventsRequest(List<CreateCalendarEventRequest> Events);
