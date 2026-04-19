@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNotableFigures, useDeleteNotableFigure } from '../hooks/useNotableFigures'
+import { useDebounce } from '../utils/useDebounce'
 import { usePersonGroups, useGroupMembers } from '../hooks/usePersonGroups'
 import { notableFiguresApi } from '../api'
 import NotableFigureDetail from '../components/notableFigures/NotableFigureDetail'
@@ -48,6 +49,7 @@ function sortFigures(figures: NotableFigure[], sortBy: SortField): NotableFigure
 
 export default function NotableFiguresPage() {
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [relFilters, setRelFilters] = useState<string[]>([])
   const [aliveFilters, setAliveFilters] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<SortField>('custom')
@@ -64,7 +66,7 @@ export default function NotableFiguresPage() {
   const [dragOverId, setDragOverId] = useState<number | null>(null)
   const [reorderError, setReorderError] = useState<string | null>(null)
 
-  const { data: figures = [], isLoading } = useNotableFigures({ search: search || undefined })
+  const { data: figures = [], isLoading } = useNotableFigures({ search: debouncedSearch || undefined })
   const { data: groups = [] } = usePersonGroups()
   const { data: groupMembers = [] } = useGroupMembers(activeGroupId)
 

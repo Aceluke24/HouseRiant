@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useResidents, useDeleteResident } from '../hooks/useResidents'
+import { useDebounce } from '../utils/useDebounce'
 import { usePersonGroups, useGroupMembers } from '../hooks/usePersonGroups'
 import { residentsApi } from '../api'
 import ResidentForm from '../components/residents/ResidentForm'
@@ -57,6 +58,7 @@ function sortResidents(residents: Resident[], sortBy: SortField): Resident[] {
 
 export default function ResidentsPage() {
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [statusFilters, setStatusFilters] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<SortField>('custom')
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null)
@@ -74,7 +76,7 @@ export default function ResidentsPage() {
 
   const { toggleFocus, isInFocus } = useFocus()
 
-  const { data: residents = [], isLoading } = useResidents({ search: search || undefined })
+  const { data: residents = [], isLoading } = useResidents({ search: debouncedSearch || undefined })
   const { data: groups = [] } = usePersonGroups()
   const { data: groupMembers = [] } = useGroupMembers(activeGroupId)
 

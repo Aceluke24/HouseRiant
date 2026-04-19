@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTasks, useDeleteTask, useUpdateTaskStatus } from '../hooks/useTasks'
+import { useDebounce } from '../utils/useDebounce'
 import TaskForm from '../components/tasks/TaskForm'
 import TaskDetail from '../components/tasks/TaskDetail'
 import AddToCalendarModal from '../components/tasks/AddToCalendarModal'
@@ -108,6 +109,7 @@ function KanbanColumn({
 
 export default function TasksPage() {
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [statusFilters, setStatusFilters] = useState<string[]>([])
   const [priorityFilters, setPriorityFilters] = useState<string[]>([])
   const [categoryFilters, setCategoryFilters] = useState<string[]>([])
@@ -122,7 +124,7 @@ export default function TasksPage() {
   const draggedIdRef = useRef<number | null>(null)
   const [dropOverStatus, setDropOverStatus] = useState<string | null>(null)
 
-  const { data: tasks = [], isLoading } = useTasks({ search: search || undefined })
+  const { data: tasks = [], isLoading } = useTasks({ search: debouncedSearch || undefined })
   const deleteTask = useDeleteTask()
   const updateTaskStatus = useUpdateTaskStatus()
 

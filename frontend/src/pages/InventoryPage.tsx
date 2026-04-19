@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useInventory, useDeleteInventoryItem } from '../hooks/useInventory'
+import { useDebounce } from '../utils/useDebounce'
 import InventoryForm from '../components/inventory/InventoryForm'
 import InventoryDetail from '../components/inventory/InventoryDetail'
 import ConfirmModal from '../components/ConfirmModal'
@@ -17,13 +18,14 @@ const CATEGORY_LABELS: Partial<Record<InventoryCategory, string>> = {
 
 export default function InventoryPage() {
   const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [categoryFilters, setCategoryFilters] = useState<InventoryCategory[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<InventoryItem | undefined>()
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
-  const { data: allItems = [], isLoading } = useInventory({ search: search || undefined })
+  const { data: allItems = [], isLoading } = useInventory({ search: debouncedSearch || undefined })
   const deleteItem = useDeleteInventoryItem()
 
   // Client-side category filter (multi-select)

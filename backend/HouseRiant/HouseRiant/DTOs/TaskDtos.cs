@@ -43,3 +43,5 @@ public record CreateTaskRequest(
     int? AssignedFamilyId,
     int? AssignedResidentId
 );
+
+public record UpdateStatusRequest(string Status);

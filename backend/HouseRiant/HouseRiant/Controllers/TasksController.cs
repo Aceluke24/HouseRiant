@@ -41,7 +41,7 @@ public class TasksController : ControllerBase
         if (!string.IsNullOrWhiteSpace(category) && Enum.TryParse<TaskCategory>(category, out var c))
             query = query.Where(t => t.Category == c);
 
-        var tasks = await query.OrderBy(t => t.Priority).ThenBy(t => t.Name).ToListAsync();
+        var tasks = await query.OrderByDescending(t => t.Priority).ThenBy(t => t.Name).ToListAsync();
         return Ok(tasks.Select(ToResponse));
     }
 
@@ -97,11 +97,12 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
-    public async Task<IActionResult> UpdateStatus(int id, [FromBody] EstateTaskStatus status)
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest req)
     {
+        if (!Enum.TryParse<EstateTaskStatus>(req.Status, out var s)) return BadRequest();
         var task = await _db.Tasks.FindAsync(id);
         if (task is null) return NotFound();
-        task.Status = status;
+        task.Status = s;
         await _db.SaveChangesAsync();
         return NoContent();
     }

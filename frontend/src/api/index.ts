@@ -79,7 +79,7 @@ export const tasksApi = {
   getById: (id: number) => api.get<EstateTask>(`/tasks/${id}`).then(r => r.data),
   create: (data: CreateTaskRequest) => api.post<EstateTask>('/tasks', data).then(r => r.data),
   update: (id: number, data: CreateTaskRequest) => api.put<EstateTask>(`/tasks/${id}`, data).then(r => r.data),
-  updateStatus: (id: number, status: string) => api.patch(`/tasks/${id}/status`, JSON.stringify(status)),
+  updateStatus: (id: number, status: string) => api.patch(`/tasks/${id}/status`, { status }),
   delete: (id: number) => api.delete(`/tasks/${id}`),
 }
 

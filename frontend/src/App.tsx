@@ -44,7 +44,7 @@ export default function App() {
           <div className="app-layout">
             <aside className="sidebar">
               <div className="sidebar-logo">
-                <h1>House Rhiant</h1>
+                <h1>House Riant</h1>
                 <p>Estate Manager</p>
               </div>
               <nav className="sidebar-nav">
