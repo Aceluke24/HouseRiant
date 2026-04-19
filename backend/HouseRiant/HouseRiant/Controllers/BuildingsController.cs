@@ -123,8 +123,8 @@ public class BuildingsController : ControllerBase
         {
             Id = assignment.Id,
             ResidentId = assignment.ResidentId,
-            ResidentName = assignment.Resident.Name,
-            ResidentImageUrl = assignment.Resident.ImageUrl,
+            ResidentName = assignment.Resident?.Name ?? string.Empty,
+            ResidentImageUrl = assignment.Resident?.ImageUrl,
             AssignmentType = assignment.AssignmentType,
         });
     }
@@ -199,8 +199,8 @@ public class BuildingsController : ControllerBase
         {
             Id = a.Id,
             ResidentId = a.ResidentId,
-            ResidentName = a.Resident.Name,
-            ResidentImageUrl = a.Resident.ImageUrl,
+            ResidentName = a.Resident?.Name ?? string.Empty,
+            ResidentImageUrl = a.Resident?.ImageUrl,
             AssignmentType = a.AssignmentType,
         }).OrderBy(a => a.ResidentName).ToList() ?? new(),
     };

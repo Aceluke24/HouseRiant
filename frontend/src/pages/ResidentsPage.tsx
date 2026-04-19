@@ -9,7 +9,7 @@ import ConfirmModal from '../components/ConfirmModal'
 import { useFocus } from '../context/FocusContext'
 import type { Resident } from '../types'
 
-const STATUS_FILTERS = ['All', 'Resident', 'HiredHelp', 'Visitor', 'Seasonal', 'Din', 'Other']
+const STATUS_FILTERS = ['All', 'Resident', 'HiredHelp', 'Visitor', 'Blank', 'Seasonal', 'Din', 'Other']
 const STATUS_LABELS: Record<string, string> = { HiredHelp: 'Hired Help' }
 
 type SortField = 'custom' | 'name' | 'family' | 'race' | 'age' | 'status'
@@ -328,7 +328,7 @@ export default function ResidentsPage() {
                           {r.status === 'Other' && r.statusOther ? r.statusOther : (STATUS_LABELS[r.status] ?? r.status)}
                         </span>
                       </td>
-                      <td>{r.role}</td>
+                      <td>{r.role ?? '—'}</td>
                       <td>{r.familyName ?? '—'}</td>
                       <td>{getRaceDisplay(r)}</td>
                       <td>{r.age ?? '—'}</td>

@@ -6,7 +6,7 @@ import CalendarForm from '../components/calendar/CalendarForm'
 import CalendarDetail from '../components/calendar/CalendarDetail'
 import TaskForm from '../components/tasks/TaskForm'
 import ConfirmModal from '../components/ConfirmModal'
-import type { CalendarEvent, CalendarEventType } from '../types'
+import type { CalendarEvent } from '../types'
 import { SEASONS, WEEKS } from '../types'
 
 // ── Today date shape ───────────────────────────────────────────────────────
@@ -50,6 +50,7 @@ const DAYS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const
 function weekDayIndex(week: string | undefined, day: number): number {
   if (!week) return day - 1
   const wi = WEEKS.indexOf(week as typeof WEEKS[number])
+  if (wi === -1) return day - 1  // unknown week treated like Brón (no named week)
   return wi * 9 + (day - 1)
 }
 
