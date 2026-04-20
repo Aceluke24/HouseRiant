@@ -319,7 +319,7 @@ export default function GroupsPage() {
               key={g.id}
               onClick={() => setSelected(selected?.id === g.id ? null : g)}
               style={{
-                width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                width: '100%', textAlign: 'left', border: 'none',
                 padding: '10px 20px', cursor: 'pointer',
                 borderLeft: `4px solid ${selected?.id === g.id ? groupColor(g.color) : 'transparent'}`,
                 background: selected?.id === g.id ? 'rgba(255,255,255,0.06)' : 'transparent',

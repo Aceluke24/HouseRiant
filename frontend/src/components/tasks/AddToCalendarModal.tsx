@@ -163,7 +163,7 @@ export default function AddToCalendarModal({ task, onClose }: Props) {
               </div>
               <div className="form-group">
                 <label>Season</label>
-                <select className="form-select" value={customSeason} onChange={e => setCustomSeason(e.target.value)}>
+                <select className="form-select" value={customSeason} onChange={e => setCustomSeason(e.target.value as any)}>
                   {SEASONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>

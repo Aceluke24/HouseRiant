@@ -21,14 +21,14 @@ const queryClient = new QueryClient({
   },
 })
 
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="page">
-      <div className="page-header"><h1>{title}</h1></div>
-      <p style={{ color: 'var(--text-muted)' }}>Coming soon.</p>
-    </div>
-  )
-}
+// function Placeholder({ title }: { title: string }) {
+//   return (
+//     <div className="page">
+//       <div className="page-header"><h1>{title}</h1></div>
+//       <p style={{ color: 'var(--text-muted)' }}>Coming soon.</p>
+//     </div>
+//   )
+// }
 
 export default function App() {
   return (
