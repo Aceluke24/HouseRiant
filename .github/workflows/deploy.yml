@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
@@ -28,9 +28,12 @@ jobs:
           ssh-keyscan -H ${{ secrets.PI_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Pi
+        env:
+          PI_USER: ${{ secrets.PI_USER }}
+          PI_HOST: ${{ secrets.PI_HOST }}
         run: |
-          ssh ${{ secrets.PI_USER }}@${{ secrets.PI_HOST }} '
-	    export PATH=$PATH:/home/lukeheaton0/.dotnet &&
+          ssh $PI_USER@$PI_HOST "
+            export PATH=\$PATH:/home/lukeheaton0/.dotnet &&
             cd ~/HouseRiant &&
             git pull &&
             cd frontend &&
@@ -40,4 +43,4 @@ jobs:
             dotnet publish -c Release -o ~/houseriant-backend &&
             sudo systemctl restart houseriant-backend &&
             sudo systemctl restart nginx
-          '
+          "
