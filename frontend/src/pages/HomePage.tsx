@@ -120,19 +120,11 @@ function LordCard({ resident, index }: { resident: Resident; index: number }) {
           </div>
         )}
 
-        {/* Top fade */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0,
-          width: '100%', height: '30%',
-          background: 'linear-gradient(to bottom, rgba(8,20,50,0.35), transparent)',
-          pointerEvents: 'none',
-        }} />
-
         {/* Bottom gradient */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0,
-          width: '100%', height: '62%',
-          background: 'linear-gradient(to top, rgba(8,20,50,0.97), transparent)',
+          width: '100%', height: '45%',
+          background: 'linear-gradient(to top, rgba(8,20,50,0.75), transparent)',
           pointerEvents: 'none',
         }} />
 
