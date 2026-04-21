@@ -28,10 +28,11 @@ public class UploadsController : ControllerBase
             return BadRequest(new { message = "File must be under 5MB." });
 
         // Save to wwwroot/images/portraits/
-        if (string.IsNullOrEmpty(_env.WebRootPath))
-            return StatusCode(500, new { message = "Server file storage is not configured." });
+        var webRoot = string.IsNullOrEmpty(_env.WebRootPath)
+            ? Path.Combine(_env.ContentRootPath, "wwwroot")
+            : _env.WebRootPath;
 
-        var portraitsDir = Path.Combine(_env.WebRootPath, "images", "portraits");
+        var portraitsDir = Path.Combine(webRoot, "images", "portraits");
         Directory.CreateDirectory(portraitsDir);
 
         var fileName = $"{Guid.NewGuid()}{ext}";

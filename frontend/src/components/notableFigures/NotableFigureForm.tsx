@@ -52,7 +52,7 @@ function buildPayload(raw: CreateNotableFigureRequest): CreateNotableFigureReque
 function PortraitUpload({ value, onChange }: { value?: string; onChange: (url: string) => void }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | undefined>(
-    value ? (value.startsWith('http') ? value : `http://localhost:4000${value}`) : undefined
+    value ?? undefined
   )
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
@@ -65,7 +65,7 @@ function PortraitUpload({ value, onChange }: { value?: string; onChange: (url: s
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('http://localhost:4000/api/uploads/portrait', {
+      const res = await fetch('/api/uploads/portrait', {
         method: 'POST',
         body: formData,
       })
@@ -74,7 +74,7 @@ function PortraitUpload({ value, onChange }: { value?: string; onChange: (url: s
         throw new Error(err.message ?? 'Upload failed')
       }
       const { url } = await res.json()
-      setPreview(`http://localhost:4000${url}`)
+      setPreview(url)
       onChange(url)
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : 'Upload failed')

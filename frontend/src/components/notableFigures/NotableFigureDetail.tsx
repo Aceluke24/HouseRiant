@@ -27,7 +27,7 @@ function DetailRow({ label, value }: { label: string; value?: string }) {
 
 export default function NotableFigureDetail({ figure: f, onEdit, onDelete, onClose }: Props) {
   const [lightbox, setLightbox] = useState(false)
-  const imgSrc = f.imageUrl ? (f.imageUrl.startsWith('http') ? f.imageUrl : `http://localhost:4000${f.imageUrl}`) : null
+  const imgSrc = f.imageUrl ?? null
 
   return (
     <div className="detail-panel">

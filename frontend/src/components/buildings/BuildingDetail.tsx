@@ -100,7 +100,7 @@ export default function BuildingDetail({ building, onEdit, onDelete, onClose }: 
     await removeAssignment.mutateAsync({ buildingId: building.id, assignmentId })
   }
 
-  const imgSrc = building.imageUrl ? `http://localhost:4000${building.imageUrl}` : null
+  const imgSrc = building.imageUrl ? building.imageUrl : null
 
   return (
     <div className="detail-panel">
@@ -263,7 +263,7 @@ export default function BuildingDetail({ building, onEdit, onDelete, onClose }: 
                   border: '1px solid var(--gold)',
                 }}>
                   {r.imageUrl
-                    ? <img src={`http://localhost:4000${r.imageUrl}`} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <img src={r.imageUrl} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <span style={{ color: '#f7f2e8', fontFamily: 'Cinzel, serif', fontSize: '0.65rem' }}>
                         {r.name.charAt(0).toUpperCase()}
                       </span>
@@ -424,7 +424,7 @@ export default function BuildingDetail({ building, onEdit, onDelete, onClose }: 
                   border: '1px solid var(--gold)',
                 }}>
                   {a.residentImageUrl
-                    ? <img src={`http://localhost:4000${a.residentImageUrl}`} alt={a.residentName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ? <img src={a.residentImageUrl} alt={a.residentName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <span style={{ color: '#f7f2e8', fontFamily: 'Cinzel, serif', fontSize: '0.65rem' }}>
                         {a.residentName.charAt(0).toUpperCase()}
                       </span>

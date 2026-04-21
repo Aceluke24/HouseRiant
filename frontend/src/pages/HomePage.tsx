@@ -68,7 +68,7 @@ function LordCard({ resident, index }: { resident: Resident; index: number }) {
   const flickerDuration = 2.8 + (index % 3) * 0.7 + (index * 0.13)
   const flickerDelay = (index * 0.37) % 2.1
   const imageUrl = resident.imageUrl
-    ? `http://localhost:4000${resident.imageUrl}`
+    ? resident.imageUrl
     : null
   const bio = resident.notes ? trimToWordBoundary(resident.notes, 65) : null
 

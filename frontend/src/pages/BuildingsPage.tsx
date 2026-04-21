@@ -166,7 +166,7 @@ export default function BuildingsPage() {
                   {b.imageUrl && (
                     <div style={{ width: '100%', height: 120, overflow: 'hidden', flexShrink: 0 }}>
                       <img
-                        src={`http://localhost:4000${b.imageUrl}`}
+                        src={b.imageUrl}
                         alt={b.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: b.imagePosition || 'center' }}
                       />
@@ -274,7 +274,7 @@ export default function BuildingsPage() {
                             flexShrink: 0,
                           }}>
                             {r.imageUrl
-                              ? <img src={`http://localhost:4000${r.imageUrl}`} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ? <img src={r.imageUrl} alt={r.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                               : <span style={{ color: '#f7f2e8', fontFamily: 'Cinzel, serif', fontSize: '0.55rem' }}>
                                   {r.name.charAt(0).toUpperCase()}
                                 </span>

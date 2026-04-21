@@ -17,7 +17,7 @@ function Initials({ name }: { name: string }) {
 
 export default function ResidentDetail({ resident: r, onEdit, onDelete, onClose }: Props) {
   const [lightbox, setLightbox] = useState(false)
-  const imgSrc = r.imageUrl ? (r.imageUrl.startsWith('http') ? r.imageUrl : `http://localhost:4000${r.imageUrl}`) : null
+  const imgSrc = r.imageUrl ?? null
 
   return (
     <div className="detail-panel">

@@ -39,7 +39,7 @@ function MemberPortrait({ name, imageUrl }: { name?: string; imageUrl?: string }
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {imageUrl
-        ? <img src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:4000${imageUrl}`} alt={n} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ? <img src={imageUrl} alt={n} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         : <span style={{ fontSize: 11, color: 'var(--gold)', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>{initials.toUpperCase()}</span>
       }
     </div>

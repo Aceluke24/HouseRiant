@@ -134,7 +134,7 @@ function CollapsedSummary({
       <div className="focus-collapsed-portrait">
         {imageUrl
           ? <img
-              src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:4000${imageUrl}`}
+              src={imageUrl}
               alt={person.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
@@ -166,7 +166,7 @@ export default function FocusProfileCard({ type, person, onRemove }: Props) {
   const [lightbox, setLightbox] = useState(false)
 
   const imageUrl = person.imageUrl
-  const imgSrc = imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `http://localhost:4000${imageUrl}`) : null
+  const imgSrc = imageUrl ? (imageUrl) : null
   const title = 'title' in person ? person.title : undefined
 
   return (

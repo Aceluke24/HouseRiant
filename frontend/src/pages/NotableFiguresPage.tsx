@@ -25,7 +25,7 @@ function Portrait({ name, imageUrl, size = 80 }: { name: string; imageUrl?: stri
   return (
     <div className={cls} style={{ width: size, height: size }}>
       {imageUrl
-        ? <img src={imageUrl.startsWith('http') ? imageUrl : `http://localhost:4000${imageUrl}`} alt={name} />
+        ? <img src={imageUrl} alt={name} />
         : <Initials name={name} />
       }
     </div>
