@@ -1622,8 +1622,8 @@ textarea { resize: vertical; min-height: 70px; }
 
 .home-lord-card-wrapper {
   position: relative;
-  width: 164px;
-  height: 239px;
+  width: 240px;
+  height: 350px;
   border-radius: 12px;
   flex-shrink: 0;
   animation: candleFlicker 3.2s ease-in-out infinite;
