@@ -295,7 +295,7 @@ export default function GroupsPage() {
         width: 280, flexShrink: 0,
         borderRight: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
-        background: 'var(--blue-deep)',
+        background: '#3d2c0e',
       }}>
         <div style={{ padding: '24px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

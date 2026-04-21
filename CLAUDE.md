@@ -134,10 +134,16 @@ dotnet ef database update
 
 ## Design System
 
-**Theme:** Heraldic fantasy — royal blue, gold, parchment
+**Theme:** Heraldic fantasy — warm dark brown sidebar, gold accents, parchment content
 
 ```css
---blue-deep:    #0f2a5c   /* sidebar background */
+/* Sidebar */
+#3d2c0e   /* sidebar body background */
+#2c2008   /* sidebar logo header background */
+#8a6618   /* sidebar right border */
+
+/* Blue palette */
+--blue-deep:    #0f2a5c   /* deep blue accent (badges, etc.) */
 --blue-royal:   #1a3f7a   /* primary blue */
 --blue-mid:     #2255a4
 --gold:         #c8a020   /* primary gold */

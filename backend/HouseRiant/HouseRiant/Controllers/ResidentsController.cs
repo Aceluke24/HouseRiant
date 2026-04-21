@@ -77,7 +77,8 @@ public class ResidentsController : ControllerBase
             Gender = req.Gender, Age = req.Age, DailyPayRate = req.DailyPayRate,
             LandOwned = req.LandOwned, Appearance = req.Appearance, Skills = req.Skills,
             TroopType = req.TroopType, LevelOfRole = req.LevelOfRole,
-            Notes = req.Notes, ImageUrl = req.ImageUrl, FamilyId = familyId
+            Notes = req.Notes, ImageUrl = req.ImageUrl, FamilyId = familyId,
+            ShowOnHomePage = req.ShowOnHomePage
         };
         _db.Residents.Add(resident);
         await _db.SaveChangesAsync();
@@ -104,6 +105,7 @@ public class ResidentsController : ControllerBase
         resident.Appearance = req.Appearance; resident.Skills = req.Skills;
         resident.TroopType = req.TroopType; resident.LevelOfRole = req.LevelOfRole;
         resident.Notes = req.Notes; resident.ImageUrl = req.ImageUrl; resident.FamilyId = familyId;
+        resident.ShowOnHomePage = req.ShowOnHomePage;
         await _db.SaveChangesAsync();
         await _db.Entry(resident).Reference(r => r.Family).LoadAsync();
         await _db.Entry(resident).Reference(r => r.Building).LoadAsync();
@@ -125,7 +127,7 @@ public class ResidentsController : ControllerBase
         r.Type, r.Race, r.KrellTribe, r.Gender?.ToString(), r.Age, r.DailyPayRate,
         r.LandOwned, r.Appearance, r.Skills, r.TroopType, r.LevelOfRole,
         r.Notes, r.ImageUrl, r.FamilyId, r.Family?.Name, r.SortOrder,
-        r.BuildingId, r.Building?.Name
+        r.BuildingId, r.Building?.Name, r.ShowOnHomePage
     );
 
     /// <summary>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj": {}
+    "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj": {}
   },
   "projects": {
-    "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj": {
+    "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
+        "projectUniqueName": "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
         "projectName": "HouseRiant",
-        "projectPath": "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
+        "projectPath": "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
         "packagesPath": "/Users/luke/.nuget/packages/",
-        "outputPath": "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/obj/",
+        "outputPath": "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/luke/.nuget/NuGet/NuGet.Config"

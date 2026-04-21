@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "d8A7sPrI1g8=",
+  "dgSpecHash": "F3r4/cFdLXs=",
   "success": true,
-  "projectFilePath": "/Users/luke/House Riant Project/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
+  "projectFilePath": "/Users/luke/HouseRiantProject/HouseRiant/backend/HouseRiant/HouseRiant/HouseRiant.csproj",
   "expectedPackageFiles": [
     "/Users/luke/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/luke/.nuget/packages/microsoft.aspnetcore.openapi/10.0.1/microsoft.aspnetcore.openapi.10.0.1.nupkg.sha512",

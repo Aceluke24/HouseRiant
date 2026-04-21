@@ -54,6 +54,7 @@ function buildResidentPayload(raw: CreateResidentRequest): CreateResidentRequest
     imageUrl: trimToUndefined(raw.imageUrl),
     notes: trimToUndefined(raw.notes),
     familyId: positiveInt(raw.familyId),
+    showOnHomePage: raw.showOnHomePage ?? false,
   }
 }
 
@@ -158,7 +159,8 @@ export default function ResidentForm({ resident, onClose }: Props) {
       landOwned: resident.landOwned, appearance: resident.appearance, skills: resident.skills,
       troopType: resident.troopType, levelOfRole: resident.levelOfRole,
       notes: resident.notes, imageUrl: resident.imageUrl, familyId: resident.familyId,
-    } : { status: 'Resident' },
+      showOnHomePage: resident.showOnHomePage,
+    } : { status: 'Resident', showOnHomePage: false },
   })
 
   const createResident = useCreateResident()
@@ -400,6 +402,21 @@ export default function ResidentForm({ resident, onClose }: Props) {
           <div className="form-group">
             <label>Notes</label>
             <textarea style={inputStyle} rows={3} {...register('notes')} placeholder="Campaign notes, secrets, relationships..." />
+          </div>
+
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 14px',
+            border: '1px solid var(--border-gold)',
+            borderRadius: 'var(--radius)',
+            background: 'var(--gold-ghost)',
+          }}>
+            <span style={{ fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--ink-mid)', letterSpacing: '0.05em' }}>
+              Pin to Home Page
+            </span>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: 6 }}>
+              <input type="checkbox" {...register('showOnHomePage')} style={{ width: 15, height: 15, accentColor: 'var(--gold)', cursor: 'pointer' }} />
+            </label>
           </div>
 
           <div className="modal-footer">

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useState } from 'react'
+import HomePage from './pages/HomePage'
 import ResidentsPage from './pages/ResidentsPage'
 import FocusViewPage from './pages/FocusViewPage'
 import { FocusProvider } from './context/FocusContext'
@@ -31,6 +33,8 @@ const queryClient = new QueryClient({
 // }
 
 export default function App() {
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
     <QueryClientProvider client={queryClient}>
       {/*
@@ -42,33 +46,121 @@ export default function App() {
       <BrowserRouter>
         <FocusProvider>
           <div className="app-layout">
-            <aside className="sidebar">
+            <aside className={`sidebar${collapsed ? ' sidebar-collapsed' : ''}`}>
+
+              {/* Header */}
               <div className="sidebar-logo">
-                <h1>House Riant</h1>
-                <p>Estate Manager</p>
+                {!collapsed && (
+                  <>
+                    <h1>House Riant</h1>
+                    <p>Estate Manager</p>
+                  </>
+                )}
               </div>
+
+              {/* Bulge toggle */}
+              <button
+                className="sidebar-toggle-bulge"
+                onClick={() => setCollapsed(c => !c)}
+                aria-label="Toggle sidebar"
+              >
+                <svg viewBox="0 0 30 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0 Q30 0 30 14 L30 42 Q30 56 0 56 Z" fill="#3d2c0e" stroke="#8a6618" strokeWidth="1"/>
+                  {collapsed ? (
+                    <>
+                      <polyline points="8,18 16,28 8,38" stroke="#c8a020" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.75"/>
+                      <polyline points="14,18 22,28 14,38" stroke="#c8a020" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.75"/>
+                    </>
+                  ) : (
+                    <>
+                      <polyline points="22,18 14,28 22,38" stroke="#c8a020" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.75"/>
+                      <polyline points="16,18 8,28 16,38" stroke="#c8a020" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.75"/>
+                    </>
+                  )}
+                </svg>
+              </button>
+
+              <div className="sidebar-nav-scroll">
               <nav className="sidebar-nav">
-                <span className="nav-section">People</span>
-                <NavLink to="/" className="nav-link" end>⚔ Residents</NavLink>
-                <NavLink to="/notable-figures" className="nav-link">👑 Notable Figures</NavLink>
-                <NavLink to="/families" className="nav-link">🏠 Families</NavLink>
-                <NavLink to="/groups" className="nav-link">👥 Groups</NavLink>
-                <NavLink to="/focus" className="nav-link">🎯 Focus View</NavLink>
 
-                <span className="nav-section">Estate</span>
-                <NavLink to="/buildings" className="nav-link">🏰 Buildings</NavLink>
-                <NavLink to="/tasks" className="nav-link">📋 Tasks</NavLink>
-                <NavLink to="/inventory" className="nav-link">📦 Inventory</NavLink>
+                {/* Home — standalone */}
+                <div className="sidebar-home-item">
+                  <NavLink to="/" className="nav-link" end title="Home">
+                    <span className="nav-icon">🏠</span>
+                    {!collapsed && <span>Home</span>}
+                  </NavLink>
+                </div>
 
-                <span className="nav-section">Records</span>
-                <NavLink to="/finances" className="nav-link">💰 Finances</NavLink>
-                <NavLink to="/calendar" className="nav-link">📅 Calendar</NavLink>
+                {/* People */}
+                {!collapsed && <span className="nav-section">People</span>}
+                <div className="sidebar-nav-group">
+                  <NavLink to="/residents" className="nav-link" title="Residents">
+                    <span className="nav-icon">⚔</span>
+                    {!collapsed && <span>Residents</span>}
+                  </NavLink>
+                  <NavLink to="/notable-figures" className="nav-link" title="Notable Figures">
+                    <span className="nav-icon">👑</span>
+                    {!collapsed && <span>Notable Figures</span>}
+                  </NavLink>
+                  <NavLink to="/families" className="nav-link" title="Families">
+                    <span className="nav-icon">🏠</span>
+                    {!collapsed && <span>Families</span>}
+                  </NavLink>
+                  <NavLink to="/groups" className="nav-link" title="Groups">
+                    <span className="nav-icon">👥</span>
+                    {!collapsed && <span>Groups</span>}
+                  </NavLink>
+                  <NavLink to="/focus" className="nav-link nav-link-last" title="Focus View">
+                    <span className="nav-icon">🎯</span>
+                    {!collapsed && <span>Focus View</span>}
+                  </NavLink>
+                </div>
+
+                {/* Estate */}
+                {!collapsed && <span className="nav-section">Estate</span>}
+                <div className="sidebar-nav-group">
+                  <NavLink to="/buildings" className="nav-link" title="Buildings">
+                    <span className="nav-icon">🏰</span>
+                    {!collapsed && <span>Buildings</span>}
+                  </NavLink>
+                  <NavLink to="/tasks" className="nav-link" title="Tasks">
+                    <span className="nav-icon">📋</span>
+                    {!collapsed && <span>Tasks</span>}
+                  </NavLink>
+                  <NavLink to="/inventory" className="nav-link nav-link-last" title="Inventory">
+                    <span className="nav-icon">📦</span>
+                    {!collapsed && <span>Inventory</span>}
+                  </NavLink>
+                </div>
+
+                {/* Records */}
+                {!collapsed && <span className="nav-section">Records</span>}
+                <div className="sidebar-nav-group">
+                  <NavLink to="/finances" className="nav-link" title="Finances">
+                    <span className="nav-icon">💰</span>
+                    {!collapsed && <span>Finances</span>}
+                  </NavLink>
+                  <NavLink to="/calendar" className="nav-link nav-link-last" title="Calendar">
+                    <span className="nav-icon">📅</span>
+                    {!collapsed && <span>Calendar</span>}
+                  </NavLink>
+                </div>
+
               </nav>
+
+              {/* Bottom bar */}
+              <div className="sidebar-bottom-bar">
+                <span className="sidebar-bottom-dot" />
+                {!collapsed && <span className="sidebar-bottom-text">DR-58</span>}
+              </div>
+              </div>{/* end sidebar-nav-scroll */}
+
             </aside>
 
             <main className="main-content">
               <Routes>
-                <Route path="/" element={<ResidentsPage />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/residents" element={<ResidentsPage />} />
                 <Route path="/focus" element={<FocusViewPage />} />
                 <Route path="/notable-figures" element={<NotableFiguresPage />} />
                 <Route path="/families" element={<FamiliesPage />} />

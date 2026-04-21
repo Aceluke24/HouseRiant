@@ -46,6 +46,8 @@ public class Resident
     public int? BuildingId { get; set; }
     public Building? Building { get; set; }
 
+    public bool ShowOnHomePage { get; set; } = false;
+
     public ICollection<EstateTask> Tasks { get; set; } = new List<EstateTask>();
     public ICollection<PersonGroupMember> GroupMemberships { get; set; } = new List<PersonGroupMember>();
     public ICollection<BuildingAssignment> BuildingAssignments { get; set; } = new List<BuildingAssignment>();

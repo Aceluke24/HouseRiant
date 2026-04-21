@@ -26,7 +26,8 @@ public record ResidentResponse(
     string? FamilyName,
     int SortOrder,
     int? BuildingId,
-    string? BuildingName
+    string? BuildingName,
+    bool ShowOnHomePage
 );
 
 public record CreateResidentRequest(
@@ -48,5 +49,6 @@ public record CreateResidentRequest(
     string? LevelOfRole,
     string? Notes,
     string? ImageUrl,
-    int? FamilyId
+    int? FamilyId,
+    bool ShowOnHomePage = false
 );

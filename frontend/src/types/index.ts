@@ -69,6 +69,7 @@ export interface Resident {
   sortOrder?: number
   buildingId?: number
   buildingName?: string
+  showOnHomePage: boolean
 }
 
 export interface CreateResidentRequest {
@@ -91,6 +92,7 @@ export interface CreateResidentRequest {
   imageUrl?: string
   notes?: string
   familyId?: number
+  showOnHomePage?: boolean
 }
 
 // ── Notable Figures ───────────────────────────────────────
