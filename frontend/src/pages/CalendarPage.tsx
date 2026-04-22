@@ -1,13 +1,14 @@
 import { Fragment, forwardRef, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useCalendar, useDeleteCalendarEvent, useDeleteCalendarEventGroup } from '../hooks/useCalendar'
+import { useCalendar, useCreateCalendarEvent, useDeleteCalendarEvent, useDeleteCalendarEventGroup } from '../hooks/useCalendar'
 import { useGameState, useUpdateGameDate } from '../hooks/useGameState'
 import CalendarForm from '../components/calendar/CalendarForm'
 import CalendarDetail from '../components/calendar/CalendarDetail'
 import TaskForm from '../components/tasks/TaskForm'
 import ConfirmModal from '../components/ConfirmModal'
-import type { CalendarEvent } from '../types'
+import type { CalendarEvent, EstateTask } from '../types'
 import { SEASONS, WEEKS } from '../types'
+import { parseCalendarDate } from '../components/CalendarDatePicker'
 
 // ── Today date shape ───────────────────────────────────────────────────────
 
@@ -314,6 +315,7 @@ export default function CalendarPage() {
   const { data: allEvents = [], isLoading } = useCalendar()
   const { data: gameState } = useGameState()
   const updateGameDate = useUpdateGameDate()
+  const createCalendarEvent = useCreateCalendarEvent()
   const deleteEvent = useDeleteCalendarEvent()
   const deleteGroup = useDeleteCalendarEventGroup()
 
@@ -417,6 +419,27 @@ export default function CalendarPage() {
     await deleteGroup.mutateAsync(confirmDeleteGroupId)
     if (selected?.recurrenceGroupId === confirmDeleteGroupId) setSelectedId(null)
     setConfirmDeleteGroupId(null)
+  }
+
+  function handleTaskCreated(task: EstateTask) {
+    const parsed = task.targetDate ? parseCalendarDate(task.targetDate) : null
+    const eventYear   = parsed?.year   ?? today.year
+    const eventSeason = parsed?.season ?? today.season
+    const eventWeek   = parsed?.week   ?? today.week
+    const eventDay    = parsed?.day    ?? today.day
+    const displayDate = task.targetDate ?? formatToday(today)
+    createCalendarEvent.mutate({
+      name:        task.name,
+      description: task.description,
+      type:        'TaskEvent',
+      year:        eventYear,
+      season:      eventSeason,
+      week:        eventWeek,
+      day:         eventDay,
+      displayDate,
+      sortOrder:   0,
+      linkedTaskId: task.id,
+    })
   }
 
   return (
@@ -562,7 +585,7 @@ export default function CalendarPage() {
         />
       )}
 
-      {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} />}
+      {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onTaskCreated={handleTaskCreated} />}
     </div>
   )
 }

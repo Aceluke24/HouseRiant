@@ -30,9 +30,10 @@ const CATEGORIES = [
 interface Props {
   task?: EstateTask
   onClose: () => void
+  onTaskCreated?: (task: EstateTask) => void
 }
 
-export default function TaskForm({ task, onClose }: Props) {
+export default function TaskForm({ task, onClose, onTaskCreated }: Props) {
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const { data: buildings = [] } = useQuery({ queryKey: ['buildings'], queryFn: buildingsApi.getAll })
@@ -93,7 +94,8 @@ export default function TaskForm({ task, onClose }: Props) {
       if (task) {
         await updateTask.mutateAsync({ id: task.id, data: payload })
       } else {
-        await createTask.mutateAsync(payload)
+        const created = await createTask.mutateAsync(payload)
+        onTaskCreated?.(created)
       }
       onClose()
     } catch (err) {
