@@ -65,9 +65,7 @@ function Particle({ index }: ParticleProps) {
 // ── Expanded Lord View ────────────────────────────────────
 
 function ExpandedLordView({ resident, onClose }: { resident: Resident; onClose: () => void }) {
-  const imageUrl = resident.imageUrl
-    ? `http://localhost:4000${resident.imageUrl}`
-    : null
+  const imageUrl = resident.imageUrl ?? null
 
   const fields = [
     { label: 'Family',     value: resident.familyName },
