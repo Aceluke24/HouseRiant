@@ -1614,13 +1614,13 @@ textarea { resize: vertical; min-height: 70px; }
 .home-lords-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 36px;
   justify-content: center;
 }
 
-/* ── Lord Card Wrapper (handles glow + border trace) ── */
+/* ── Lord Scene (outermost wrapper — carries flicker + hover lift) ── */
 
-.home-lord-card-wrapper {
+.home-lord-scene {
   position: relative;
   width: 240px;
   height: 350px;
@@ -1628,6 +1628,10 @@ textarea { resize: vertical; min-height: 70px; }
   flex-shrink: 0;
   animation: candleFlicker 3.2s ease-in-out infinite;
   transition: transform 300ms cubic-bezier(.23,1.1,.32,1);
+  box-shadow:
+    0 0 18px 2px #c8a02055,
+    0 0 36px 8px #e8c04033,
+    0 0 0 #0000;
 }
 
 .home-lords-grid > *:nth-child(2) { animation-duration: 3.7s; animation-delay: 0.6s; }
@@ -1635,23 +1639,239 @@ textarea { resize: vertical; min-height: 70px; }
 .home-lords-grid > *:nth-child(4) { animation-duration: 3.5s; animation-delay: 0.3s; }
 .home-lords-grid > *:nth-child(5) { animation-duration: 4.1s; animation-delay: 1.8s; }
 
-.home-lord-card-wrapper:hover {
+.home-lord-scene:hover {
   transform: translateY(-12px) scale(1.045);
   z-index: 2;
 }
 
-/* Border trace — separate element so it never inherits candleFlicker */
+/* ── Lord Card Wrapper (absolutely positioned inside scene) ── */
 
-
-
-/* Enhanced candle flicker effect for lord cards */
 .home-lord-card-wrapper {
-  /* ...existing styles... */
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 240px;
+  height: 350px;
+  border-radius: 12px;
+}
+
+/* ── Hover info panel (slides up inside the card on hover) ── */
+
+.home-lord-scene {
+  cursor: pointer;
+}
+
+.home-lord-hover-panel {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top,
+    rgba(5,12,30,0.97) 0%,
+    rgba(5,12,30,0.95) 70%,
+    rgba(5,12,30,0) 100%);
+  padding: 48px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.32s ease, transform 0.35s cubic-bezier(.23,1,.32,1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.home-lord-scene:hover .home-lord-hover-panel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.home-lord-hover-row {
+  display: flex;
+  gap: 16px;
+}
+
+.home-lord-hover-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.home-lord-hover-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: rgba(200,160,32,0.75);
+  text-transform: uppercase;
+  border-bottom: 0.5px solid rgba(200,160,32,0.25);
+  padding-bottom: 2px;
+}
+
+.home-lord-hover-value {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  color: #c8d8e8;
+  line-height: 1.3;
+}
+
+/* ── Card text block fades on hover ── */
+
+.home-lord-card-text {
+  transition: opacity 0.2s ease;
+}
+
+.home-lord-scene:hover .home-lord-card-text {
+  opacity: 0;
+}
+
+/* ── Expanded Lord Overlay ── */
+
+.lord-expanded-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 20, 50, 0.88);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lordBackdropIn 0.22s ease;
+}
+
+@keyframes lordBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lord-expanded-modal {
+  position: relative;
+  display: flex;
+  width: min(740px, 92vw);
+  max-height: 88vh;
+  border-radius: 14px;
+  border: 1px solid rgba(200,160,32,0.55);
+  overflow: hidden;
   box-shadow:
-    0 0 18px 2px #c8a02055,
-    0 0 36px 8px #e8c04033,
-    0 0 0 #0000;
-  animation: candleFlicker 3.2s ease-in-out infinite;
+    0 0 60px 12px rgba(200,160,32,0.18),
+    0 24px 80px rgba(0,0,0,0.7);
+  animation: lordModalIn 0.3s cubic-bezier(.23,1.1,.32,1);
+}
+
+@keyframes lordModalIn {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.lord-expanded-portrait-wrap {
+  width: 280px;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--blue-deep);
+  overflow: hidden;
+}
+
+.lord-expanded-portrait-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.lord-expanded-portrait-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-royal);
+}
+
+.lord-expanded-info {
+  flex: 1;
+  background: #0b1628;
+  padding: 28px 24px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.lord-expanded-name {
+  font-family: 'Cinzel', serif;
+  color: var(--gold-light);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  line-height: 1.2;
+  padding-right: 32px;
+}
+
+.lord-expanded-title-badge {
+  display: inline-block;
+  border: 0.5px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 2px 10px;
+  border-radius: 3px;
+  background: rgba(200,160,32,0.08);
+  margin-bottom: 20px;
+}
+
+.lord-expanded-divider {
+  height: 0.5px;
+  background: rgba(200,160,32,0.2);
+  margin: 12px 0;
+}
+
+.lord-expanded-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.lord-expanded-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lord-expanded-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: rgba(200,160,32,0.6);
+  text-transform: uppercase;
+}
+
+.lord-expanded-value {
+  font-family: 'EB Garamond', serif;
+  font-size: 15px;
+  color: #c8d8e8;
+  line-height: 1.45;
+}
+
+.lord-expanded-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(200,160,32,0.45);
+  background: rgba(8,20,50,0.65);
+  color: var(--gold);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s;
+  line-height: 1;
+}
+
+.lord-expanded-close:hover {
+  background: rgba(200,160,32,0.2);
 }
 
 @keyframes candleFlicker0 {

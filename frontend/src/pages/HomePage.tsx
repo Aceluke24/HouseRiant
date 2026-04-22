@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import crestImage from '../assets/crest.png'
 import { useResidents } from '../hooks/useResidents'
 import { useGameState } from '../hooks/useGameState'
@@ -61,22 +62,82 @@ function Particle({ index }: ParticleProps) {
   )
 }
 
+// ── Expanded Lord View ────────────────────────────────────
+
+function ExpandedLordView({ resident, onClose }: { resident: Resident; onClose: () => void }) {
+  const imageUrl = resident.imageUrl
+    ? `http://localhost:4000${resident.imageUrl}`
+    : null
+
+  const fields = [
+    { label: 'Family',     value: resident.familyName },
+    { label: 'Role',       value: resident.role },
+    { label: 'Race',       value: resident.race },
+    { label: 'Gender',     value: resident.gender },
+    { label: 'Age',        value: resident.age != null ? String(resident.age) : undefined },
+    { label: 'Status',     value: resident.status },
+    { label: 'Skills',     value: resident.skills },
+    { label: 'Appearance', value: resident.appearance },
+    { label: 'Land Owned', value: resident.landOwned },
+    { label: 'Notes',      value: resident.notes },
+  ].filter(f => f.value)
+
+  return (
+    <div className="lord-expanded-backdrop" onClick={onClose}>
+      <div className="lord-expanded-modal" onClick={e => e.stopPropagation()}>
+        {/* Portrait */}
+        <div className="lord-expanded-portrait-wrap">
+          {imageUrl ? (
+            <img src={imageUrl} alt={resident.name} />
+          ) : (
+            <div className="lord-expanded-portrait-placeholder">
+              <svg width="64" height="64" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="16" r="10" fill="rgba(200,160,32,0.4)" />
+                <path d="M4 44 C4 30 44 30 44 44" fill="rgba(200,160,32,0.4)" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* Info panel */}
+        <div className="lord-expanded-info">
+          <h2 className="lord-expanded-name">{resident.name}</h2>
+          {resident.title && (
+            <span className="lord-expanded-title-badge">{resident.title}</span>
+          )}
+          <div className="lord-expanded-divider" />
+          <div className="lord-expanded-fields">
+            {fields.map(f => (
+              <div key={f.label} className="lord-expanded-field">
+                <span className="lord-expanded-label">{f.label}</span>
+                <span className="lord-expanded-value">{f.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button className="lord-expanded-close" onClick={onClose}>✕</button>
+      </div>
+    </div>
+  )
+}
+
 // ── Lord Card ─────────────────────────────────────────────
 
-function LordCard({ resident, index }: { resident: Resident; index: number }) {
+function LordCard({ resident, index, onExpand }: { resident: Resident; index: number; onExpand: () => void }) {
   // Candle flicker: randomize duration/delay per card for subtle difference
   const flickerDuration = 2.8 + (index % 3) * 0.7 + (index * 0.13)
   const flickerDelay = (index * 0.37) % 2.1
-  const imageUrl = resident.imageUrl
-    ? resident.imageUrl
-    : null
+  const imageUrl = resident.imageUrl ? resident.imageUrl : null
   const bio = resident.notes ? trimToWordBoundary(resident.notes, 65) : null
+  const flickerAnimName = `candleFlicker${index % 5}`
 
-  // Give each card a unique animation name for flicker
-  const flickerAnimName = `candleFlicker${index % 5}`;
+  const age = resident.age != null ? String(resident.age) : undefined
+
   return (
     <div
-      className="home-lord-card-wrapper"
+      className="home-lord-scene"
+      onClick={onExpand}
       style={{
         animationName: flickerAnimName,
         animationDuration: `${flickerDuration}s`,
@@ -85,96 +146,137 @@ function LordCard({ resident, index }: { resident: Resident; index: number }) {
         animationTimingFunction: 'ease-in-out',
       }}
     >
-      <div className="home-lord-card">
-        {/* Portrait with staggered ink reveal */}
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={resident.name}
-            className="lord-portrait-ink"
-            style={{
+      {/* Card */}
+      <div className="home-lord-card-wrapper">
+        <div className="home-lord-card">
+          {/* Portrait with staggered ink reveal */}
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={resident.name}
+              className="lord-portrait-ink"
+              style={{
+                position: 'absolute',
+                top: 0, left: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'top center',
+                animationName: 'inkReveal',
+                animationDuration: '2.6s',
+                animationTimingFunction: 'ease-out',
+                animationFillMode: 'both',
+                animationDelay: `${index * 180}ms`,
+              }}
+            />
+          ) : (
+            <div style={{
               position: 'absolute',
               top: 0, left: 0,
               width: '100%', height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'top center',
-              animationName: 'inkReveal',
-              animationDuration: '2.6s',
-              animationTimingFunction: 'ease-out',
-              animationFillMode: 'both',
-              animationDelay: `${index * 180}ms`,
-            }}
-          />
-        ) : (
-          <div style={{
-            position: 'absolute',
-            top: 0, left: 0,
-            width: '100%', height: '100%',
-            background: 'var(--blue-royal)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="16" r="10" fill="rgba(200,160,32,0.4)" />
-              <path d="M4 44 C4 30 44 30 44 44" fill="rgba(200,160,32,0.4)" />
-            </svg>
-          </div>
-        )}
-
-        {/* Bottom gradient */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0,
-          width: '100%', height: '45%',
-          background: 'linear-gradient(to top, rgba(8,20,50,0.75), transparent)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* Gold diamond ornament */}
-        <svg
-          width="16" height="16" viewBox="0 0 16 16"
-          style={{ position: 'absolute', top: 8, right: 8, opacity: 0.55, pointerEvents: 'none' }}
-        >
-          <path d="M8 1 L15 8 L8 15 L1 8 Z" stroke="#c8a020" fill="none" />
-          <circle cx="8" cy="8" r="2" fill="#c8a020" />
-        </svg>
-
-        {/* Text block */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '10px 12px 14px',
-          display: 'flex', flexDirection: 'column', gap: 4,
-        }}>
-          <span style={{
-            alignSelf: 'flex-start',
-            border: '0.5px solid var(--gold)',
-            color: 'var(--gold)',
-            fontSize: 8,
-            borderRadius: 3,
-            padding: '1px 6px',
-            background: 'rgba(8,20,50,0.4)',
-            fontFamily: 'Cinzel, serif',
-            letterSpacing: '0.05em',
-          }}>
-            {resident.title ?? 'Din'}
-          </span>
-          <span style={{
-            fontFamily: 'Cinzel, serif',
-            color: 'var(--gold-light)',
-            fontSize: 11.5,
-            fontWeight: 600,
-            lineHeight: 1.3,
-          }}>
-            {resident.name}
-          </span>
-          {bio && (
-            <span style={{
-              fontFamily: 'EB Garamond, Georgia, serif',
-              color: '#b8cfe0',
-              fontSize: 8,
-              lineHeight: 1.55,
+              background: 'var(--blue-royal)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              {bio}
-            </span>
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="16" r="10" fill="rgba(200,160,32,0.4)" />
+                <path d="M4 44 C4 30 44 30 44 44" fill="rgba(200,160,32,0.4)" />
+              </svg>
+            </div>
           )}
+
+          {/* Bottom gradient */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0,
+            width: '100%', height: '45%',
+            background: 'linear-gradient(to top, rgba(8,20,50,0.75), transparent)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Gold diamond ornament */}
+          <svg
+            width="16" height="16" viewBox="0 0 16 16"
+            style={{ position: 'absolute', top: 8, right: 8, opacity: 0.55, pointerEvents: 'none' }}
+          >
+            <path d="M8 1 L15 8 L8 15 L1 8 Z" stroke="#c8a020" fill="none" />
+            <circle cx="8" cy="8" r="2" fill="#c8a020" />
+          </svg>
+
+          {/* Hover info panel — slides up on hover */}
+          <div className="home-lord-hover-panel">
+            {resident.name && (
+              <div className="home-lord-hover-field">
+                <span className="home-lord-hover-label">Name</span>
+                <span className="home-lord-hover-value">{resident.name}</span>
+              </div>
+            )}
+            {resident.title && (
+              <div className="home-lord-hover-field">
+                <span className="home-lord-hover-label">Title</span>
+                <span className="home-lord-hover-value">{resident.title}</span>
+              </div>
+            )}
+            {(resident.race || age) && (
+              <div className="home-lord-hover-row">
+                {resident.race && (
+                  <div className="home-lord-hover-field">
+                    <span className="home-lord-hover-label">Race</span>
+                    <span className="home-lord-hover-value">{resident.race}</span>
+                  </div>
+                )}
+                {age && (
+                  <div className="home-lord-hover-field">
+                    <span className="home-lord-hover-label">Age</span>
+                    <span className="home-lord-hover-value">{age}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {resident.familyName && (
+              <div className="home-lord-hover-field">
+                <span className="home-lord-hover-label">Family</span>
+                <span className="home-lord-hover-value">{resident.familyName}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Text block — fades out on hover */}
+          <div className="home-lord-card-text" style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding: '10px 12px 14px',
+            display: 'flex', flexDirection: 'column', gap: 4,
+          }}>
+            <span style={{
+              alignSelf: 'flex-start',
+              border: '0.5px solid var(--gold)',
+              color: 'var(--gold)',
+              fontSize: 8,
+              borderRadius: 3,
+              padding: '1px 6px',
+              background: 'rgba(8,20,50,0.4)',
+              fontFamily: 'Cinzel, serif',
+              letterSpacing: '0.05em',
+            }}>
+              {resident.title ?? 'Din'}
+            </span>
+            <span style={{
+              fontFamily: 'Cinzel, serif',
+              color: 'var(--gold-light)',
+              fontSize: 11.5,
+              fontWeight: 600,
+              lineHeight: 1.3,
+            }}>
+              {resident.name}
+            </span>
+            {bio && (
+              <span style={{
+                fontFamily: 'EB Garamond, Georgia, serif',
+                color: '#b8cfe0',
+                fontSize: 8,
+                lineHeight: 1.55,
+              }}>
+                {bio}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -186,6 +288,7 @@ function LordCard({ resident, index }: { resident: Resident; index: number }) {
 export default function HomePage() {
   const { data: residents = [], isLoading: residentsLoading } = useResidents()
   const { data: gameState, isLoading: dateLoading } = useGameState()
+  const [expandedLord, setExpandedLord] = useState<Resident | null>(null)
 
   const pinnedLords = residents.filter(r => r.showOnHomePage)
 
@@ -258,11 +361,15 @@ export default function HomePage() {
         ) : (
           <div className="home-lords-grid">
             {pinnedLords.map((resident, i) => (
-              <LordCard key={resident.id} resident={resident} index={i} />
+              <LordCard key={resident.id} resident={resident} index={i} onExpand={() => setExpandedLord(resident)} />
             ))}
           </div>
         )}
       </div>
+
+      {expandedLord && (
+        <ExpandedLordView resident={expandedLord} onClose={() => setExpandedLord(null)} />
+      )}
 
     </div>
   )
