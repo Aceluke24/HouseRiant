@@ -1,4 +1,5 @@
 import { SEASONS, WEEKS } from '../types'
+import { useGameState } from '../hooks/useGameState'
 
 // ── Formatting helpers ─────────────────────────────────────
 
@@ -63,8 +64,6 @@ export function parseCalendarDate(dateStr: string): {
     : null
 }
 
-const DEFAULT_SEASON = SEASONS.find(s => !s.startsWith('Brón:')) ?? SEASONS[0]
-const DEFAULT_YEAR = 58
 const DAYS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 // ── Component ──────────────────────────────────────────────
@@ -81,12 +80,14 @@ interface Props {
  * Shows a "Set date" button when empty; shows dropdowns + Clear when a date is chosen.
  */
 export default function CalendarDatePicker({ value, onChange }: Props) {
+  const { data: gameState } = useGameState()
   const parsed = value ? parseCalendarDate(value) : null
 
-  const year   = parsed?.year   ?? DEFAULT_YEAR
-  const season = parsed?.season ?? DEFAULT_SEASON
-  const week   = parsed?.week   ?? WEEKS[0]
-  const day    = parsed?.day    ?? 1
+  const fallbackSeason = SEASONS.find(s => !s.startsWith('Brón:')) ?? SEASONS[0]
+  const year   = parsed?.year   ?? (gameState?.currentYear   ?? 58)
+  const season = parsed?.season ?? (gameState?.currentSeason ?? fallbackSeason)
+  const week   = parsed?.week   ?? (gameState?.currentWeek   ?? WEEKS[0])
+  const day    = parsed?.day    ?? (gameState?.currentDay    ?? 1)
   const bron   = isBron(season)
 
   function emit(y: number, s: string, w: string, d: number) {
