@@ -5,6 +5,7 @@ import { usePersonGroups, useGroupMembers } from '../hooks/usePersonGroups'
 import { residentsApi } from '../api'
 import ResidentForm from '../components/residents/ResidentForm'
 import ResidentDetail from '../components/residents/ResidentDetail'
+import ImportResidentsModal from '../components/residents/ImportResidentsModal'
 import ConfirmModal from '../components/ConfirmModal'
 import { useFocus } from '../context/FocusContext'
 import type { Resident } from '../types'
@@ -66,6 +67,7 @@ export default function ResidentsPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState<Resident | undefined>()
+  const [showImport, setShowImport] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
   // Drag state
@@ -197,7 +199,10 @@ export default function ResidentsPage() {
     <div className="page">
       <div className="page-header">
         <h1>Residents</h1>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Resident</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn-secondary" onClick={() => setShowImport(true)}>↑ Import</button>
+          <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Resident</button>
+        </div>
       </div>
 
       <div className="toolbar">
@@ -407,6 +412,13 @@ export default function ResidentsPage() {
       )}
 
       {showForm && <ResidentForm resident={editTarget} onClose={handleFormClose} />}
+
+      {showImport && (
+        <ImportResidentsModal
+          existingResidents={residents}
+          onClose={() => setShowImport(false)}
+        />
+      )}
 
       {confirmDeleteId != null && (
         <ConfirmModal

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using HouseRhiant.Api.Data;
 using HouseRhiant.Api.DTOs;
 using HouseRhiant.Api.Models;
@@ -11,7 +12,8 @@ namespace HouseRhiant.Api.Controllers;
 public class ResidentsController : ControllerBase
 {
     private readonly AppDbContext _db;
-    public ResidentsController(AppDbContext db) => _db = db;
+    private readonly IConfiguration _config;
+    public ResidentsController(AppDbContext db, IConfiguration config) { _db = db; _config = config; }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ResidentResponse>>> GetAll(
@@ -120,6 +122,93 @@ public class ResidentsController : ControllerBase
         _db.Residents.Remove(resident);
         await _db.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPost("batch")]
+    public async Task<ActionResult<BatchImportResponse>> BatchImport([FromBody] BatchImportRequest req)
+    {
+        var expectedKey = _config["ApiSettings:ImportApiKey"];
+        if (!Request.Headers.TryGetValue("X-Api-Key", out var providedKey) || providedKey != expectedKey)
+            return Unauthorized(new { message = "Missing or invalid X-Api-Key header." });
+
+        var response = new BatchImportResponse();
+
+        foreach (var item in req.Items)
+        {
+            if (string.IsNullOrWhiteSpace(item.Name)) continue;
+
+            // Resolve FamilyId: accepts int id or family name string
+            int? familyId = null;
+            if (item.FamilyId.HasValue)
+            {
+                var fid = item.FamilyId.Value;
+                if (fid.ValueKind == JsonValueKind.Number && fid.TryGetInt32(out int idVal))
+                {
+                    if (await _db.Families.AnyAsync(f => f.Id == idVal))
+                        familyId = idVal;
+                }
+                else if (fid.ValueKind == JsonValueKind.String)
+                {
+                    var fname = fid.GetString() ?? "";
+                    var family = await _db.Families
+                        .FirstOrDefaultAsync(f => f.Name.ToLower() == fname.ToLower());
+                    if (family != null) familyId = family.Id;
+                }
+            }
+
+            // Duplicate check (case-insensitive name)
+            var existing = await _db.Residents
+                .Include(r => r.Family).Include(r => r.Building)
+                .FirstOrDefaultAsync(r => r.Name.ToLower() == item.Name.ToLower());
+
+            if (existing != null)
+            {
+                Family? incomingFamily = familyId.HasValue
+                    ? await _db.Families.FindAsync(familyId.Value)
+                    : null;
+                response.Conflicts.Add(new BatchImportConflictDto
+                {
+                    Incoming = BuildPreviewResponse(item, familyId, incomingFamily),
+                    Existing = ToResponse(existing),
+                });
+                continue;
+            }
+
+            if (!Enum.TryParse<PersonStatus>(item.Status ?? "Resident", out var status))
+                status = PersonStatus.Resident;
+
+            var resident = new Resident
+            {
+                Name = item.Name, Status = status, StatusOther = item.StatusOther,
+                Title = item.Title, Role = item.Role, Type = item.Type, Race = item.Race,
+                KrellTribe = item.KrellTribe, Age = item.Age, DailyPayRate = item.DailyPayRate,
+                LandOwned = item.LandOwned, Appearance = item.Appearance, Skills = item.Skills,
+                TroopType = item.TroopType, LevelOfRole = item.LevelOfRole,
+                Notes = item.Notes, ImageUrl = item.ImageUrl, FamilyId = familyId,
+                ShowOnHomePage = item.ShowOnHomePage,
+            };
+            if (item.Gender != null && Enum.TryParse<Gender>(item.Gender, out var gender))
+                resident.Gender = gender;
+
+            _db.Residents.Add(resident);
+            await _db.SaveChangesAsync();
+            await _db.Entry(resident).Reference(r => r.Family).LoadAsync();
+            await _db.Entry(resident).Reference(r => r.Building).LoadAsync();
+            response.Created.Add(ToResponse(resident));
+        }
+
+        return Ok(response);
+    }
+
+    private static ResidentResponse BuildPreviewResponse(BatchResidentItemDto item, int? familyId, Family? family)
+    {
+        Enum.TryParse<PersonStatus>(item.Status ?? "Resident", out var status);
+        return new ResidentResponse(
+            0, item.Name, status.ToString(), item.StatusOther, item.Title, item.Role,
+            item.Type, item.Race, item.KrellTribe, item.Gender, item.Age, item.DailyPayRate,
+            item.LandOwned, item.Appearance, item.Skills, item.TroopType, item.LevelOfRole,
+            item.Notes, item.ImageUrl, familyId, family?.Name, 0, null, null, item.ShowOnHomePage
+        );
     }
 
     private static ResidentResponse ToResponse(Resident r) => new(

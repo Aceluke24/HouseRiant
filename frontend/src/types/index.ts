@@ -438,3 +438,61 @@ export interface CreateCalendarEventRequest {
   endWeek?: string
   endDay?: number
 }
+
+// ── Batch Import ──────────────────────────────────────────
+
+export interface BatchResidentItem {
+  name: string
+  status?: PersonStatus
+  statusOther?: string
+  title?: string
+  role?: string
+  type?: string
+  race?: string
+  krellTribe?: string
+  gender?: Gender
+  age?: number
+  dailyPayRate?: number
+  landOwned?: string
+  appearance?: string
+  skills?: string
+  troopType?: string
+  levelOfRole?: string
+  imageUrl?: string
+  notes?: string
+  familyId?: number | string
+  showOnHomePage?: boolean
+}
+
+export interface BatchImportConflict {
+  incoming: Resident
+  existing: Resident
+}
+
+export interface BatchImportResponse {
+  created: Resident[]
+  conflicts: BatchImportConflict[]
+}
+
+// ── World Map ─────────────────────────────────────────────
+
+export interface WorldLocation {
+  id: number
+  name: string
+  description?: string
+  notes?: string
+  isUnlocked: boolean
+  xPercent: number
+  yPercent: number
+  locationType?: string
+}
+
+export interface CreateWorldLocationRequest {
+  name: string
+  description?: string
+  notes?: string
+  isUnlocked: boolean
+  xPercent: number
+  yPercent: number
+  locationType?: string
+}

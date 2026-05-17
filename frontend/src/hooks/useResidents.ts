@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { residentsApi } from '../api'
-import type { CreateResidentRequest } from '../types'
+import type { CreateResidentRequest, BatchResidentItem } from '../types'
 
 export const RESIDENTS_KEY = 'residents'
 
@@ -32,6 +32,15 @@ export function useDeleteResident() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: number) => residentsApi.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [RESIDENTS_KEY] }),
+  })
+}
+
+export function useBatchImportResidents() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ items, apiKey }: { items: BatchResidentItem[]; apiKey: string }) =>
+      residentsApi.batchImport(items, apiKey),
     onSuccess: () => qc.invalidateQueries({ queryKey: [RESIDENTS_KEY] }),
   })
 }

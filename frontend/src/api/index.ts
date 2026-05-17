@@ -11,6 +11,8 @@ import type {
   CalendarEvent, CreateCalendarEventRequest,
   ChronicleEntry, CreateChronicleEntryRequest,
   Tag, CreateTagRequest,
+  BatchResidentItem, BatchImportResponse,
+  WorldLocation, CreateWorldLocationRequest,
 } from '../types'
 
 const api = axios.create({
@@ -36,6 +38,12 @@ export const residentsApi = {
   update: (id: number, data: CreateResidentRequest) => api.put<Resident>(`/residents/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/residents/${id}`),
   reorder: (items: { id: number; sortOrder: number }[]) => api.put('/residents/reorder', items),
+  batchImport: (items: BatchResidentItem[], apiKey: string) =>
+    api.post<BatchImportResponse>(
+      '/residents/batch',
+      { items },
+      { headers: { 'X-Api-Key': apiKey } }
+    ).then(r => r.data),
 }
 
 // ── Notable Figures ───────────────────────────────────────
@@ -126,6 +134,16 @@ export const tagsApi = {
   getAll: () => api.get<Tag[]>('/tags').then(r => r.data),
   create: (data: CreateTagRequest) => api.post<Tag>('/tags', data).then(r => r.data),
   delete: (id: number) => api.delete(`/tags/${id}`),
+}
+
+// ── World Locations ───────────────────────────────────────
+export const worldLocationsApi = {
+  getAll: () => api.get<WorldLocation[]>('/worldlocations').then(r => r.data),
+  create: (data: CreateWorldLocationRequest) =>
+    api.post<WorldLocation>('/worldlocations', data).then(r => r.data),
+  update: (id: number, data: CreateWorldLocationRequest) =>
+    api.put<WorldLocation>(`/worldlocations/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/worldlocations/${id}`),
 }
 
 // ── Calendar ──────────────────────────────────────────────

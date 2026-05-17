@@ -2067,3 +2067,109 @@ textarea { resize: vertical; min-height: 70px; }
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* ── World Map ──────────────────────────────────────────── */
+
+.world-map-layout {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  height: calc(100vh - 120px);
+}
+
+.world-map-area {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.world-map-container {
+  position: relative;
+  display: inline-block;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.world-map-container.world-map-view-mode {
+  cursor: default;
+}
+
+.world-map-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  border: 2px solid var(--border-gold);
+  border-radius: var(--radius);
+}
+
+.world-map-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.world-map-pin-dot {
+  font-size: 20px;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  transition: transform 0.15s;
+}
+
+.world-map-pin:hover .world-map-pin-dot {
+  transform: scale(1.25);
+}
+
+.world-map-pin-unlocked .world-map-pin-dot { color: var(--gold); }
+.world-map-pin-locked   .world-map-pin-dot { color: var(--ink-muted); }
+
+.world-map-pin-label {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  color: var(--ink);
+  background: rgba(247,242,232,0.9);
+  border-radius: 3px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  margin-top: 2px;
+  border: 1px solid var(--border-gold);
+  pointer-events: none;
+}
+
+.world-map-pin-label-locked {
+  color: var(--ink-muted);
+  border-color: var(--border);
+  background: rgba(247,242,232,0.7);
+}
+
+.world-map-pin-selected .world-map-pin-dot {
+  transform: scale(1.3);
+  filter: drop-shadow(0 0 4px var(--gold));
+}
+
+.world-map-placing-hint {
+  font-size: 12px;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--gold-ghost);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+}
+
+.world-map-pending-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  z-index: 20;
+  color: var(--gold-light);
+  font-size: 22px;
+  opacity: 0.75;
+}

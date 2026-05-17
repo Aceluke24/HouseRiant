@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
     public DbSet<ChronicleEntryTag> ChronicleEntryTags { get; set; }
     public DbSet<ChronicleEntryResident> ChronicleEntryResidents { get; set; }
     public DbSet<ChronicleEntryNotableFigure> ChronicleEntryNotableFigures { get; set; }
+    public DbSet<WorldLocation> WorldLocations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -300,6 +301,16 @@ public class AppDbContext : DbContext
              .WithMany()
              .HasForeignKey(ef => ef.NotableFigureId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // WorldLocation
+        modelBuilder.Entity<WorldLocation>(e =>
+        {
+            e.HasKey(w => w.Id);
+            e.Property(w => w.Name).IsRequired().HasMaxLength(200);
+            e.Property(w => w.Description).IsRequired(false);
+            e.Property(w => w.Notes).IsRequired(false);
+            e.Property(w => w.LocationType).IsRequired(false).HasMaxLength(100);
         });
 
         // Seed estate finances
