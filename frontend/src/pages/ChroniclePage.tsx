@@ -2,13 +2,13 @@ import { useMemo, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import {
   useChronicleEntries, useCreateChronicleEntry, useUpdateChronicleEntry, useDeleteChronicleEntry,
-  useTags, useCreateTag, useDeleteTag,
+  useTags, useCreateTag,
 } from '../hooks/useChronicle'
 import { useResidents } from '../hooks/useResidents'
 import { useNotableFigures } from '../hooks/useNotableFigures'
 import CalendarDatePicker from '../components/CalendarDatePicker'
 import ConfirmModal from '../components/ConfirmModal'
-import type { ChronicleEntry, CreateChronicleEntryRequest, Tag, CreateTagRequest } from '../types'
+import type { ChronicleEntry, CreateChronicleEntryRequest } from '../types'
 
 // ── Chronicle Entry Form (modal) ──────────────────────────
 
@@ -425,7 +425,6 @@ export default function ChroniclePage() {
   })
   const { data: allTags = [] }  = useTags()
   const deleteEntry = useDeleteChronicleEntry()
-  const deleteTag   = useDeleteTag()
 
   // Client-side tag filter (multi-select)
   const filteredEntries = useMemo(() => {
