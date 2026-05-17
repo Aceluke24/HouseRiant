@@ -5,8 +5,9 @@ import {
   useIncomeSources, useCreateIncomeSource, useUpdateIncomeSource, useDeleteIncomeSource,
 } from '../hooks/useFinances'
 import { useGameState } from '../hooks/useGameState'
+import { useResidents } from '../hooks/useResidents'
 import ConfirmModal from '../components/ConfirmModal'
-import type { EstateFinances, IncomeSource, CreateIncomeSourceRequest } from '../types'
+import type { EstateFinances, IncomeSource, CreateIncomeSourceRequest, Resident } from '../types'
 
 // ── Currency helpers ──────────────────────────────────────
 
@@ -408,6 +409,372 @@ function StatCard({ label, value, highlight, textColor, onAdjust, currentTin, di
   )
 }
 
+// ── Finance Calculator ────────────────────────────────────
+
+type CalcOp = '+' | '-' | '×' | '÷'
+type ValType = 'number' | 'named'
+
+const NAMED_VALUE_KEYS = [
+  'All Residents',
+  'Active Residents',
+  'Hired Help',
+  'Bank Balance',
+  'Loan Amount',
+  'Daily Mine Income',
+] as const
+type NamedValueKey = typeof NAMED_VALUE_KEYS[number]
+
+function applyOp(a: number, op: CalcOp, b: number): number {
+  if (op === '+') return a + b
+  if (op === '-') return a - b
+  if (op === '×') return a * b
+  if (op === '÷') return b !== 0 ? a / b : 0
+  return a
+}
+
+interface CalculatorSectionProps {
+  finances: EstateFinances | undefined
+  residents: Resident[]
+  incomeSources: IncomeSource[]
+  onApplyToBalance: (mode: 'add' | 'subtract', amount: number) => Promise<void>
+}
+
+function CalculatorSection({ finances, residents, incomeSources, onApplyToBalance }: CalculatorSectionProps) {
+  const [val1, setVal1] = useState('')
+  const [op1, setOp1] = useState<CalcOp>('+')
+  const [val2Type, setVal2Type] = useState<ValType>('number')
+  const [val2, setVal2] = useState('')
+  const [val2Named, setVal2Named] = useState<NamedValueKey>('Bank Balance')
+
+  const [showRow2, setShowRow2] = useState(false)
+  const [op2, setOp2] = useState<CalcOp>('+')
+  const [val3Type, setVal3Type] = useState<ValType>('number')
+  const [val3, setVal3] = useState('')
+  const [val3Named, setVal3Named] = useState<NamedValueKey>('Bank Balance')
+
+  const [showApplyModal, setShowApplyModal] = useState(false)
+  const [applyPending, setApplyPending] = useState(false)
+
+  const totalDailyIncome = incomeSources.filter(s => s.isActive).reduce((sum, s) => sum + s.dailyYieldTin, 0)
+
+  const namedValues: Record<NamedValueKey, number> = {
+    'All Residents':     residents.length,
+    'Active Residents':  residents.filter(r => r.status === 'Resident').length,
+    'Hired Help':        residents.filter(r => r.status === 'HiredHelp').length,
+    'Bank Balance':      finances?.bankBalanceTin ?? 0,
+    'Loan Amount':       finances?.loanAmountTin ?? 0,
+    'Daily Mine Income': totalDailyIncome,
+  }
+
+  const n1 = Number(val1) || 0
+  const n2 = val2Type === 'named' ? namedValues[val2Named] : (Number(val2) || 0)
+  const result1 = applyOp(n1, op1, n2)
+  const n3 = val3Type === 'named' ? namedValues[val3Named] : (Number(val3) || 0)
+  const finalResult = showRow2 ? applyOp(result1, op2, n3) : result1
+
+  const handleApply = async (mode: 'add' | 'subtract') => {
+    setApplyPending(true)
+    await onApplyToBalance(mode, finalResult)
+    setApplyPending(false)
+    setShowApplyModal(false)
+  }
+
+  const rowStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  }
+
+  const opSelectStyle: React.CSSProperties = {
+    width: 56,
+    textAlign: 'center',
+    fontFamily: 'var(--font-heading)',
+    fontSize: 16,
+  }
+
+  const numInputStyle: React.CSSProperties = {
+    width: 110,
+  }
+
+  return (
+    <div style={{
+      background: 'var(--white)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)',
+      overflow: 'hidden',
+    }}>
+      <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+        {/* Row 1 */}
+        <div style={rowStyle}>
+          <input
+            className="form-input"
+            type="number"
+            step="any"
+            placeholder="Value"
+            value={val1}
+            onChange={e => setVal1(e.target.value)}
+            style={numInputStyle}
+          />
+
+          <select
+            className="form-select"
+            value={op1}
+            onChange={e => setOp1(e.target.value as CalcOp)}
+            style={opSelectStyle}
+          >
+            {(['+', '-', '×', '÷'] as CalcOp[]).map(o => (
+              <option key={o} value={o}>{o}</option>
+            ))}
+          </select>
+
+          {/* Type toggle */}
+          <div style={{ display: 'flex', gap: 2 }}>
+            <button
+              type="button"
+              className={val2Type === 'number' ? 'chip chip-active' : 'chip'}
+              style={{ fontSize: 11, padding: '3px 8px' }}
+              onClick={() => setVal2Type('number')}
+            >
+              #
+            </button>
+            <button
+              type="button"
+              className={val2Type === 'named' ? 'chip chip-active' : 'chip'}
+              style={{ fontSize: 11, padding: '3px 8px' }}
+              onClick={() => setVal2Type('named')}
+            >
+              Named
+            </button>
+          </div>
+
+          {val2Type === 'number' ? (
+            <input
+              className="form-input"
+              type="number"
+              step="any"
+              placeholder="Value"
+              value={val2}
+              onChange={e => setVal2(e.target.value)}
+              style={numInputStyle}
+            />
+          ) : (
+            <select
+              className="form-select"
+              value={val2Named}
+              onChange={e => setVal2Named(e.target.value as NamedValueKey)}
+              style={{ minWidth: 160 }}
+            >
+              {NAMED_VALUE_KEYS.map(k => (
+                <option key={k} value={k}>{k} ({namedValues[k].toLocaleString()})</option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Row 2 (chained) */}
+        {showRow2 && (
+          <div style={rowStyle}>
+            <span style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 11,
+              color: 'var(--ink-muted)',
+              minWidth: 110,
+              textAlign: 'right',
+            }}>
+              = {result1.toLocaleString(undefined, { maximumFractionDigits: 4 })} tin
+            </span>
+
+            <select
+              className="form-select"
+              value={op2}
+              onChange={e => setOp2(e.target.value as CalcOp)}
+              style={opSelectStyle}
+            >
+              {(['+', '-', '×', '÷'] as CalcOp[]).map(o => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+
+            {/* Type toggle row 2 */}
+            <div style={{ display: 'flex', gap: 2 }}>
+              <button
+                type="button"
+                className={val3Type === 'number' ? 'chip chip-active' : 'chip'}
+                style={{ fontSize: 11, padding: '3px 8px' }}
+                onClick={() => setVal3Type('number')}
+              >
+                #
+              </button>
+              <button
+                type="button"
+                className={val3Type === 'named' ? 'chip chip-active' : 'chip'}
+                style={{ fontSize: 11, padding: '3px 8px' }}
+                onClick={() => setVal3Type('named')}
+              >
+                Named
+              </button>
+            </div>
+
+            {val3Type === 'number' ? (
+              <input
+                className="form-input"
+                type="number"
+                step="any"
+                placeholder="Value"
+                value={val3}
+                onChange={e => setVal3(e.target.value)}
+                style={numInputStyle}
+              />
+            ) : (
+              <select
+                className="form-select"
+                value={val3Named}
+                onChange={e => setVal3Named(e.target.value as NamedValueKey)}
+                style={{ minWidth: 160 }}
+              >
+                {NAMED_VALUE_KEYS.map(k => (
+                  <option key={k} value={k}>{k} ({namedValues[k].toLocaleString()})</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
+        {/* Chain button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            style={{ fontSize: 11, padding: '3px 10px' }}
+            onClick={() => setShowRow2(r => !r)}
+          >
+            {showRow2 ? '− Remove chain' : '+ Chain operation'}
+          </button>
+        </div>
+      </div>
+
+      {/* Result bar */}
+      <div style={{
+        background: 'var(--blue-deep)',
+        padding: '0.75rem 1.25rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        flexWrap: 'wrap',
+      }}>
+        <div>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 10, color: 'var(--ink-faint)', letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 10 }}>
+            Result
+          </span>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 20, color: 'var(--gold-light)', fontWeight: 500 }}>
+            {finalResult.toLocaleString(undefined, { maximumFractionDigits: 4 })} tin
+          </span>
+        </div>
+        {finances && (
+          <button
+            className="btn-primary"
+            style={{ fontSize: 12, padding: '5px 14px' }}
+            onClick={() => setShowApplyModal(true)}
+          >
+            Apply to Bank Balance
+          </button>
+        )}
+      </div>
+
+      {/* Apply modal */}
+      {showApplyModal && finances && (
+        <div className="modal-backdrop" onClick={() => setShowApplyModal(false)}>
+          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Apply to Bank Balance</h2>
+              <button className="modal-close" onClick={() => setShowApplyModal(false)}>✕</button>
+            </div>
+            <div className="modal-form">
+              <div style={{
+                background: 'var(--parchment)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                padding: '0.75rem 1rem',
+                marginBottom: '1.25rem',
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                lineHeight: 1.8,
+              }}>
+                <div>
+                  <span style={{ color: 'var(--ink-muted)' }}>Current Bank Balance: </span>
+                  <strong>{finances.bankBalanceTin.toLocaleString()} tin</strong>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--ink-muted)' }}>Calculator Result: </span>
+                  <strong>{finalResult.toLocaleString(undefined, { maximumFractionDigits: 4 })} tin</strong>
+                </div>
+              </div>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--ink-mid)', marginBottom: '1rem' }}>
+                Add or subtract the result from the Bank Balance?
+              </p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 8,
+                marginBottom: '0.5rem',
+              }}>
+                <div style={{
+                  background: 'var(--success-bg)',
+                  border: '1px solid rgba(26,92,42,0.2)',
+                  borderRadius: 'var(--radius)',
+                  padding: '0.5rem 0.75rem',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 13,
+                  color: 'var(--success)',
+                }}>
+                  New balance (add):{' '}
+                  <strong>{(finances.bankBalanceTin + finalResult).toLocaleString(undefined, { maximumFractionDigits: 4 })} tin</strong>
+                </div>
+                <div style={{
+                  background: 'var(--danger-bg)',
+                  border: '1px solid rgba(139,26,26,0.2)',
+                  borderRadius: 'var(--radius)',
+                  padding: '0.5rem 0.75rem',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 13,
+                  color: 'var(--danger)',
+                }}>
+                  New balance (subtract):{' '}
+                  <strong>{(finances.bankBalanceTin - finalResult).toLocaleString(undefined, { maximumFractionDigits: 4 })} tin</strong>
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="btn-secondary" onClick={() => setShowApplyModal(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="btn-danger"
+                  disabled={applyPending}
+                  onClick={() => handleApply('subtract')}
+                  style={{ fontSize: 13 }}
+                >
+                  − Subtract
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  disabled={applyPending}
+                  onClick={() => handleApply('add')}
+                  style={{ fontSize: 13 }}
+                >
+                  + Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Main Page ─────────────────────────────────────────────
 
 type AdjustTarget = {
@@ -426,6 +793,7 @@ export default function FinancesPage() {
   const { data: finances, isLoading: loadingFinances, isError: errorFinances } = useFinances()
   const { data: gameState } = useGameState()
   const { data: incomeSources = [], isLoading: loadingIncome, isError: errorIncome } = useIncomeSources()
+  const { data: residents = [] } = useResidents()
   const deleteSource = useDeleteIncomeSource()
   const updateFinances = useUpdateFinances()
 
@@ -458,7 +826,24 @@ export default function FinancesPage() {
     await updateFinances.mutateAsync({ ...finances, [field]: newTin })
   }
 
+  const handleApplyToBalance = async (mode: 'add' | 'subtract', amount: number) => {
+    if (!finances) return
+    const newBalance = mode === 'add'
+      ? finances.bankBalanceTin + amount
+      : finances.bankBalanceTin - amount
+    await updateFinances.mutateAsync({ ...finances, bankBalanceTin: newBalance })
+  }
+
   const fmt = (v: number) => formatAmount(v, displayUnit)
+
+  const sectionHeadingStyle: React.CSSProperties = {
+    fontFamily: 'var(--font-heading)',
+    fontSize: 14,
+    color: 'var(--ink-light)',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    marginBottom: '0.75rem',
+  }
 
   return (
     <div className="page">
@@ -469,7 +854,7 @@ export default function FinancesPage() {
       {/* ── Estate Snapshot ─────────────────────────────── */}
       <section style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: 8 }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 14, color: 'var(--ink-light)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <h2 style={sectionHeadingStyle}>
             Estate Snapshot
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -558,10 +943,21 @@ export default function FinancesPage() {
         )}
       </section>
 
+      {/* ── Finance Calculator ───────────────────────────── */}
+      <section style={{ marginBottom: '2rem' }}>
+        <h2 style={sectionHeadingStyle}>Finance Calculator</h2>
+        <CalculatorSection
+          finances={finances}
+          residents={residents}
+          incomeSources={incomeSources}
+          onApplyToBalance={handleApplyToBalance}
+        />
+      </section>
+
       {/* ── Income Sources ───────────────────────────────── */}
       <section>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 14, color: 'var(--ink-light)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <h2 style={sectionHeadingStyle}>
             Income Sources
           </h2>
           <button className="btn-primary" style={{ fontSize: 12, padding: '4px 14px' }} onClick={() => setShowIncomeForm(true)}>

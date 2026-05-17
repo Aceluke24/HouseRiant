@@ -9,6 +9,8 @@ import type {
   GameState, EstateFinances, IncomeSource, CreateIncomeSourceRequest, UpdateGameDateRequest,
   InventoryItem, CreateInventoryItemRequest,
   CalendarEvent, CreateCalendarEventRequest,
+  ChronicleEntry, CreateChronicleEntryRequest,
+  Tag, CreateTagRequest,
 } from '../types'
 
 const api = axios.create({
@@ -106,6 +108,24 @@ export const inventoryApi = {
   create: (data: CreateInventoryItemRequest) => api.post<InventoryItem>('/inventory', data).then(r => r.data),
   update: (id: number, data: CreateInventoryItemRequest) => api.put<InventoryItem>(`/inventory/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/inventory/${id}`),
+}
+
+// ── Chronicle ─────────────────────────────────────────────
+export const chronicleApi = {
+  getAll: (params?: { search?: string; tag?: string }) =>
+    api.get<ChronicleEntry[]>('/chronicle', { params }).then(r => r.data),
+  create: (data: CreateChronicleEntryRequest) =>
+    api.post<ChronicleEntry>('/chronicle', data).then(r => r.data),
+  update: (id: number, data: CreateChronicleEntryRequest) =>
+    api.put<ChronicleEntry>(`/chronicle/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/chronicle/${id}`),
+}
+
+// ── Tags ──────────────────────────────────────────────────
+export const tagsApi = {
+  getAll: () => api.get<Tag[]>('/tags').then(r => r.data),
+  create: (data: CreateTagRequest) => api.post<Tag>('/tags', data).then(r => r.data),
+  delete: (id: number) => api.delete(`/tags/${id}`),
 }
 
 // ── Calendar ──────────────────────────────────────────────

@@ -20,6 +20,11 @@ public class AppDbContext : DbContext
     public DbSet<PersonGroup> PersonGroups { get; set; }
     public DbSet<PersonGroupMember> PersonGroupMembers { get; set; }
     public DbSet<BuildingAssignment> BuildingAssignments { get; set; }
+    public DbSet<ChronicleEntry> ChronicleEntries { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<ChronicleEntryTag> ChronicleEntryTags { get; set; }
+    public DbSet<ChronicleEntryResident> ChronicleEntryResidents { get; set; }
+    public DbSet<ChronicleEntryNotableFigure> ChronicleEntryNotableFigures { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -234,6 +239,66 @@ public class AppDbContext : DbContext
             e.HasOne(a => a.Resident)
              .WithMany(r => r.BuildingAssignments)
              .HasForeignKey(a => a.ResidentId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ChronicleEntry
+        modelBuilder.Entity<ChronicleEntry>(e =>
+        {
+            e.HasKey(c => c.Id);
+            e.Property(c => c.Title).IsRequired().HasMaxLength(300);
+            e.Property(c => c.Body).IsRequired();
+            e.Property(c => c.EntryDate).IsRequired(false);
+        });
+
+        // Tag
+        modelBuilder.Entity<Tag>(e =>
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Name).IsRequired().HasMaxLength(100);
+            e.HasIndex(t => t.Name).IsUnique();
+            e.Property(t => t.Color).IsRequired(false).HasMaxLength(20);
+        });
+
+        // ChronicleEntryTag — cascade when entry or tag is deleted
+        modelBuilder.Entity<ChronicleEntryTag>(e =>
+        {
+            e.HasKey(et => et.Id);
+            e.HasOne(et => et.ChronicleEntry)
+             .WithMany(c => c.EntryTags)
+             .HasForeignKey(et => et.ChronicleEntryId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(et => et.Tag)
+             .WithMany(t => t.EntryTags)
+             .HasForeignKey(et => et.TagId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ChronicleEntryResident — cascade when entry is deleted, cascade when resident is deleted
+        modelBuilder.Entity<ChronicleEntryResident>(e =>
+        {
+            e.HasKey(er => er.Id);
+            e.HasOne(er => er.ChronicleEntry)
+             .WithMany(c => c.EntryResidents)
+             .HasForeignKey(er => er.ChronicleEntryId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(er => er.Resident)
+             .WithMany()
+             .HasForeignKey(er => er.ResidentId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ChronicleEntryNotableFigure — cascade when entry or figure is deleted
+        modelBuilder.Entity<ChronicleEntryNotableFigure>(e =>
+        {
+            e.HasKey(ef => ef.Id);
+            e.HasOne(ef => ef.ChronicleEntry)
+             .WithMany(c => c.EntryNotableFigures)
+             .HasForeignKey(ef => ef.ChronicleEntryId)
+             .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(ef => ef.NotableFigure)
+             .WithMany()
+             .HasForeignKey(ef => ef.NotableFigureId)
              .OnDelete(DeleteBehavior.Cascade);
         });
 

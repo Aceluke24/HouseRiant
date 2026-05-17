@@ -16,6 +16,7 @@ import BuildingsPage from './pages/BuildingsPage'
 import TasksPage from './pages/TasksPage'
 import InventoryPage from './pages/InventoryPage'
 import FinancesPage from './pages/FinancesPage'
+import ChroniclePage from './pages/ChroniclePage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -140,9 +141,13 @@ export default function App() {
                     <span className="nav-icon">💰</span>
                     {!collapsed && <span>Finances</span>}
                   </NavLink>
-                  <NavLink to="/calendar" className="nav-link nav-link-last" title="Calendar">
+                  <NavLink to="/calendar" className="nav-link" title="Calendar">
                     <span className="nav-icon">📅</span>
                     {!collapsed && <span>Calendar</span>}
+                  </NavLink>
+                  <NavLink to="/chronicle" className="nav-link nav-link-last" title="Chronicle">
+                    <span className="nav-icon">📖</span>
+                    {!collapsed && <span>Chronicle</span>}
                   </NavLink>
                 </div>
 
@@ -170,6 +175,7 @@ export default function App() {
                 <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/finances" element={<FinancesPage />} />
                 <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/chronicle" element={<ChroniclePage />} />
               </Routes>
             </main>
           </div>

@@ -1954,6 +1954,115 @@ textarea { resize: vertical; min-height: 70px; }
   100% { box-shadow: 0 0 8px rgba(200,160,32,0.25), 0 0 20px rgba(200,160,32,0.08); }
 }
 
+/* ── Tab navigation (Feature 1 & reusable) ─────────────── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+.tab-btn {
+  padding: 0.5rem 1.25rem;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  color: var(--ink-muted);
+  transition: color 0.15s;
+}
+.tab-btn.active {
+  color: var(--blue-royal);
+  border-bottom-color: var(--gold);
+}
+.tab-btn:hover:not(.active) { color: var(--ink); }
+
+/* ── Due for Review cards (Feature 1) ──────────────────── */
+.review-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.review-card-title {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 500;
+  flex: 1;
+  min-width: 140px;
+}
+.review-card-badges { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.review-card-date {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.review-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── Chronicle cards (Feature 3) ────────────────────────── */
+.chronicle-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  margin-bottom: 0.5rem;
+}
+.chronicle-card:hover {
+  border-color: var(--blue-mid);
+  box-shadow: 0 2px 8px rgba(26,63,122,0.08);
+}
+.chronicle-card.selected {
+  border-color: var(--gold);
+  background: var(--gold-ghost);
+}
+.chronicle-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+.chronicle-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.chronicle-card-date {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chronicle-card-body {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 13px;
+  color: var(--ink-mid);
+  margin: 0 0 0.4rem;
+  line-height: 1.5;
+}
+.chronicle-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
 @keyframes borderTrace {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

@@ -378,6 +378,50 @@ export interface CalendarEvent {
   endDay?: number       // end day 1-9 (null = same day as start)
 }
 
+// ── Chronicle ─────────────────────────────────────────────
+
+export interface TagSummary {
+  id: number
+  name: string
+  color?: string
+}
+
+export interface LinkedPersonSummary {
+  id: number
+  name: string
+}
+
+export interface ChronicleEntry {
+  id: number
+  title: string
+  body: string
+  entryDate?: string
+  createdAt: string
+  tags: TagSummary[]
+  residents: LinkedPersonSummary[]
+  notableFigures: LinkedPersonSummary[]
+}
+
+export interface CreateChronicleEntryRequest {
+  title: string
+  body: string
+  entryDate?: string
+  tagIds?: number[]
+  residentIds?: number[]
+  notableFigureIds?: number[]
+}
+
+export interface Tag {
+  id: number
+  name: string
+  color?: string
+}
+
+export interface CreateTagRequest {
+  name: string
+  color?: string
+}
+
 export interface CreateCalendarEventRequest {
   name: string
   description?: string
