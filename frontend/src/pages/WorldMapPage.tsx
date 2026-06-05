@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 
-const MIN_ZOOM = 0.25
 const MAX_ZOOM = 4
-const ZOOM_STEP = 0.15
+const ZOOM_STEP = 0.05
 
 export default function WorldMapPage() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -11,6 +10,7 @@ export default function WorldMapPage() {
   const panX = useRef(0)
   const panY = useRef(0)
   const zoom = useRef(1)
+  const fitZoom = useRef(1)
   const dragging = useRef(false)
   const dragStart = useRef({ x: 0, y: 0 })
 
@@ -27,8 +27,17 @@ export default function WorldMapPage() {
     const container = containerRef.current
     const img = imgRef.current
     if (!container || !img) return
-    panX.current = (container.clientWidth - img.naturalWidth) / 2
-    panY.current = (container.clientHeight - img.naturalHeight) / 2
+
+    const fit = Math.min(
+      container.clientWidth / img.naturalWidth,
+      container.clientHeight / img.naturalHeight
+    )
+    fitZoom.current = fit
+    zoom.current = fit
+    setDisplayZoom(fit)
+
+    panX.current = (container.clientWidth - img.naturalWidth * fit) / 2
+    panY.current = (container.clientHeight - img.naturalHeight * fit) / 2
     applyTransform()
   }
 
@@ -39,7 +48,7 @@ export default function WorldMapPage() {
     const cy = container.clientHeight / 2
     const imgX = (cx - panX.current) / zoom.current
     const imgY = (cy - panY.current) / zoom.current
-    const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom.current + delta))
+    const newZoom = Math.min(MAX_ZOOM, Math.max(fitZoom.current, zoom.current + delta))
     panX.current = cx - imgX * newZoom
     panY.current = cy - imgY * newZoom
     zoom.current = newZoom
@@ -48,8 +57,6 @@ export default function WorldMapPage() {
   }
 
   function handleReset() {
-    zoom.current = 1
-    setDisplayZoom(1)
     centerImage()
   }
 
