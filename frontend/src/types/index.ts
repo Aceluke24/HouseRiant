@@ -474,3 +474,102 @@ export interface BatchImportResponse {
   conflicts: BatchImportConflict[]
 }
 
+// ── Gods ──────────────────────────────────────────────────
+
+export type GodTier = 'Primal' | 'Chadarim' | 'Amadí' | 'Maru'
+
+export interface God {
+  id: number
+  name: string
+  tier: GodTier
+  primaryDomain?: string
+  description?: string
+  notes?: string
+  isActive: boolean
+}
+
+export interface CreateGodRequest {
+  name: string
+  tier: GodTier
+  primaryDomain?: string
+  description?: string
+  notes?: string
+  isActive: boolean
+}
+
+// ── Skills ────────────────────────────────────────────────
+
+export interface Skill {
+  id: number
+  name: string
+  category: string
+  trained: boolean
+  xpCost: number
+  coreAttribute?: string
+  description?: string
+  notes?: string
+}
+
+export interface CreateSkillRequest {
+  name: string
+  category: string
+  trained: boolean
+  xpCost: number
+  coreAttribute?: string
+  description?: string
+  notes?: string
+}
+
+// ── Shop ──────────────────────────────────────────────────
+
+export interface ShopItem {
+  id: number
+  name: string
+  category: string
+  baseCostTin: number
+  weightLbs?: number
+  description?: string
+  notes?: string
+  defaultMaterial?: string
+}
+
+export interface CreateShopItemRequest {
+  name: string
+  category: string
+  baseCostTin: number
+  weightLbs?: number
+  description?: string
+  notes?: string
+  defaultMaterial?: string
+}
+
+// ── Organizations ─────────────────────────────────────────
+
+export type OrgType = 'Guild' | 'Religious Order' | 'Criminal' | 'Political' | 'Military' | 'Merchant' | 'Other'
+export type OrgRelationship = 'Allied' | 'Neutral' | 'Hostile' | 'Unknown' | 'Member'
+
+export interface Organization {
+  id: number
+  name: string
+  type: OrgType
+  description?: string
+  headquarters?: string
+  leader?: string
+  relationship: OrgRelationship
+  allegiance?: string
+  isActive: boolean
+  notes?: string
+}
+
+export interface CreateOrganizationRequest {
+  name: string
+  type: OrgType
+  description?: string
+  headquarters?: string
+  leader?: string
+  relationship: OrgRelationship
+  allegiance?: string
+  isActive: boolean
+  notes?: string
+}
+

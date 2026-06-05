@@ -18,6 +18,10 @@ import InventoryPage from './pages/InventoryPage'
 import FinancesPage from './pages/FinancesPage'
 import ChroniclePage from './pages/ChroniclePage'
 import WorldMapPage from './pages/WorldMapPage'
+import GodsPage from './pages/GodsPage'
+import SkillsPage from './pages/SkillsPage'
+import ShopPage from './pages/ShopPage'
+import OrganizationsPage from './pages/OrganizationsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -112,9 +116,30 @@ export default function App() {
                     <span className="nav-icon">👥</span>
                     {!collapsed && <span>Groups</span>}
                   </NavLink>
+                  <NavLink to="/organizations" className="nav-link" title="Organizations">
+                    <span className="nav-icon">⚜</span>
+                    {!collapsed && <span>Organizations</span>}
+                  </NavLink>
                   <NavLink to="/focus" className="nav-link nav-link-last" title="Focus View">
                     <span className="nav-icon">🎯</span>
                     {!collapsed && <span>Focus View</span>}
+                  </NavLink>
+                </div>
+
+                {/* Lore */}
+                {!collapsed && <span className="nav-section">Lore</span>}
+                <div className="sidebar-nav-group">
+                  <NavLink to="/lore/gods" className="nav-link" title="Gods">
+                    <span className="nav-icon">✦</span>
+                    {!collapsed && <span>Gods</span>}
+                  </NavLink>
+                  <NavLink to="/lore/skills" className="nav-link" title="Skills">
+                    <span className="nav-icon">📚</span>
+                    {!collapsed && <span>Skills</span>}
+                  </NavLink>
+                  <NavLink to="/lore/shop" className="nav-link nav-link-last" title="Shop">
+                    <span className="nav-icon">🪙</span>
+                    {!collapsed && <span>Shop</span>}
                   </NavLink>
                 </div>
 
@@ -182,6 +207,10 @@ export default function App() {
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/chronicle" element={<ChroniclePage />} />
                 <Route path="/world-map" element={<WorldMapPage />} />
+                <Route path="/lore/gods" element={<GodsPage />} />
+                <Route path="/lore/skills" element={<SkillsPage />} />
+                <Route path="/lore/shop" element={<ShopPage />} />
+                <Route path="/organizations" element={<OrganizationsPage />} />
               </Routes>
             </main>
           </div>

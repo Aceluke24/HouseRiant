@@ -885,6 +885,27 @@ textarea { resize: vertical; min-height: 70px; }
 .badge-battle { background: rgba(192,64,32,0.1); color: #c04020; border: 1px solid rgba(192,64,32,0.3); }
 .badge-task   { background: rgba(80,50,160,0.1); color: #5032a0; border: 1px solid rgba(80,50,160,0.3); }
 
+/* ── God tier badges ───────────────────────────────────── */
+.badge-primal   { background: rgba(26,26,92,0.1);  color: #4a5abb; border: 1px solid rgba(74,90,187,0.3); }
+.badge-chadarim { background: var(--success-bg);   color: var(--success); border: 1px solid rgba(26,92,42,0.25); }
+.badge-amadi    { background: var(--danger-bg);    color: var(--danger);  border: 1px solid rgba(139,26,26,0.25); }
+.badge-maru     { background: var(--parchment2);   color: var(--ink-muted); border: 1px solid var(--border); }
+
+/* ── Organization type badges ──────────────────────────── */
+.badge-guild           { background: var(--blue-pale);          color: var(--blue-royal); border: 1px solid var(--border-mid); }
+.badge-religious-order { background: var(--gold-pale);          color: #6b5000;           border: 1px solid var(--border-gold); }
+.badge-criminal        { background: var(--danger-bg);          color: var(--danger);     border: 1px solid rgba(139,26,26,0.25); }
+.badge-political       { background: rgba(80,30,120,0.08);      color: #5a1e8a;           border: 1px solid rgba(90,30,138,0.25); }
+.badge-military        { background: rgba(20,60,20,0.08);       color: #1a5c2a;           border: 1px solid rgba(26,92,42,0.25); }
+.badge-merchant        { background: var(--parchment2);         color: var(--ink-mid);    border: 1px solid var(--border); }
+.badge-org-other       { background: var(--parchment2);         color: var(--ink-muted);  border: 1px solid var(--border); }
+
+/* ── Organization relationship badges ─────────────────── */
+.badge-allied  { background: var(--success-bg);       color: var(--success); border: 1px solid rgba(26,92,42,0.25); }
+.badge-hostile { background: var(--danger-bg);        color: var(--danger);  border: 1px solid rgba(139,26,26,0.25); }
+.badge-member  { background: var(--blue-pale);        color: var(--blue-royal); border: 1px solid var(--border-mid); }
+.badge-unknown { background: var(--parchment2);       color: var(--ink-muted); border: 1px solid var(--border); }
+
 /* Year navigation */
 .cal-year-nav { display: flex; align-items: center; gap: 4px; }
 .cal-year-label {

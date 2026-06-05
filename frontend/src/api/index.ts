@@ -12,6 +12,10 @@ import type {
   ChronicleEntry, CreateChronicleEntryRequest,
   Tag, CreateTagRequest,
   BatchResidentItem, BatchImportResponse,
+  God, CreateGodRequest,
+  Skill, CreateSkillRequest,
+  ShopItem, CreateShopItemRequest,
+  Organization, CreateOrganizationRequest,
 } from '../types'
 
 const api = axios.create({
@@ -145,4 +149,44 @@ export const calendarApi = {
   batchCreate: (events: CreateCalendarEventRequest[]) =>
     api.post<CalendarEvent[]>('/calendar/batch', { events }).then(r => r.data),
   deleteGroup: (groupId: number) => api.delete(`/calendar/group/${groupId}`),
+}
+
+// ── Gods ──────────────────────────────────────────────────
+export const godsApi = {
+  getAll: (params?: { search?: string; tier?: string }) =>
+    api.get<God[]>('/gods', { params }).then(r => r.data),
+  getById: (id: number) => api.get<God>(`/gods/${id}`).then(r => r.data),
+  create: (data: CreateGodRequest) => api.post<God>('/gods', data).then(r => r.data),
+  update: (id: number, data: CreateGodRequest) => api.put<God>(`/gods/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/gods/${id}`),
+}
+
+// ── Skills ─────────────────────────────────────────────────
+export const skillsApi = {
+  getAll: (params?: { search?: string; category?: string; trained?: string }) =>
+    api.get<Skill[]>('/skills', { params }).then(r => r.data),
+  getById: (id: number) => api.get<Skill>(`/skills/${id}`).then(r => r.data),
+  create: (data: CreateSkillRequest) => api.post<Skill>('/skills', data).then(r => r.data),
+  update: (id: number, data: CreateSkillRequest) => api.put<Skill>(`/skills/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/skills/${id}`),
+}
+
+// ── Shop ───────────────────────────────────────────────────
+export const shopApi = {
+  getAll: (params?: { search?: string; category?: string }) =>
+    api.get<ShopItem[]>('/shop', { params }).then(r => r.data),
+  getById: (id: number) => api.get<ShopItem>(`/shop/${id}`).then(r => r.data),
+  create: (data: CreateShopItemRequest) => api.post<ShopItem>('/shop', data).then(r => r.data),
+  update: (id: number, data: CreateShopItemRequest) => api.put<ShopItem>(`/shop/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/shop/${id}`),
+}
+
+// ── Organizations ─────────────────────────────────────────
+export const organizationsApi = {
+  getAll: (params?: { search?: string; type?: string; relationship?: string }) =>
+    api.get<Organization[]>('/organizations', { params }).then(r => r.data),
+  getById: (id: number) => api.get<Organization>(`/organizations/${id}`).then(r => r.data),
+  create: (data: CreateOrganizationRequest) => api.post<Organization>('/organizations', data).then(r => r.data),
+  update: (id: number, data: CreateOrganizationRequest) => api.put<Organization>(`/organizations/${id}`, data).then(r => r.data),
+  delete: (id: number) => api.delete(`/organizations/${id}`),
 }
