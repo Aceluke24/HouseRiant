@@ -108,9 +108,6 @@ export default function WorldMapPage() {
           overflow: 'hidden',
           position: 'relative',
           cursor: dragging.current ? 'grabbing' : 'grab',
-          border: '2px solid var(--gold)',
-          borderRadius: 4,
-          background: '#1a1208',
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -129,6 +126,8 @@ export default function WorldMapPage() {
             left: 0,
             transformOrigin: '0 0',
             userSelect: 'none',
+            border: '2px solid var(--gold)',
+            borderRadius: 4,
           }}
         />
       </div>
