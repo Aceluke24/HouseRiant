@@ -131,14 +131,13 @@ export default function ImportResidentsModal({ existingResidents, onClose }: Pro
               {errors.jsonInput && <p className="form-error">JSON is required.</p>}
             </div>
             <div className="form-group">
-              <label className="form-label">API Key</label>
+              <label className="form-label">Password</label>
               <input
                 type="password"
                 className="form-input"
-                placeholder="house-riant-import-key-change-me"
                 {...register('apiKey', { required: true })}
               />
-              {errors.apiKey && <p className="form-error">API key is required.</p>}
+              {errors.apiKey && <p className="form-error">Password is required.</p>}
             </div>
             {parseError && <p className="form-error" style={{ marginBottom: 8 }}>{parseError}</p>}
             <div className="modal-footer">
