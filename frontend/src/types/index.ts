@@ -474,25 +474,3 @@ export interface BatchImportResponse {
   conflicts: BatchImportConflict[]
 }
 
-// ── World Map ─────────────────────────────────────────────
-
-export interface WorldLocation {
-  id: number
-  name: string
-  description?: string
-  notes?: string
-  isUnlocked: boolean
-  xPercent: number
-  yPercent: number
-  locationType?: string
-}
-
-export interface CreateWorldLocationRequest {
-  name: string
-  description?: string
-  notes?: string
-  isUnlocked: boolean
-  xPercent: number
-  yPercent: number
-  locationType?: string
-}
