@@ -89,7 +89,7 @@ export default function WorldMapPage() {
   }, [])
 
   return (
-    <div className="page" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="page" style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingRight: '0.5rem' }}>
       <div className="page-header">
         <h1>World Map</h1>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
